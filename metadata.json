@@ -1,0 +1,5 @@
+{
+  "name": "Remix: iOS 20 Home Screen",
+  "description": "A vanilla JS implementation of an iOS 20 style home screen with jiggle mode, drag and drop, and dynamic island.",
+  "requestFramePermissions": []
+}
