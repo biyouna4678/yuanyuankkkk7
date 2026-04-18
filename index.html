@@ -3931,171 +3931,173 @@
     <div x-show="activeApp === 'chat'" class="absolute inset-0 z-[100] bg-sophia-bg flex flex-col" x-data="chatApp()" @init-chat.window="init()" style="display: none;" x-transition>
         
         <!-- List Tab -->
-        <div x-show="activeTab === 'list'" class="h-full flex flex-col relative">
+        <div x-show="activeTab === 'list'" class="h-full flex flex-col relative bg-[#fdf2f7] overflow-hidden">
             <!-- Header -->
-            <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex justify-between items-center border-b border-sophia-border/30">
-                <button @click="closeApp()" class="w-10 h-10 flex items-center justify-start text-sophia-accent text-2xl font-light">‹</button>
-                <h1 class="text-lg font-semibold text-gray-800 tracking-tight">聊天</h1>
-                <button @click="activeTab = 'create'" class="w-10 h-10 flex items-center justify-end text-sophia-accent">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-            </header>
+            <div class="text-center py-2.5 relative shrink-0 pt-10">
+                <div class="text-[13px] text-gray-800 flex items-center justify-center gap-1.5">
+                    剩余未读留言99+ 
+                    <svg width="16" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                </div>
+                <!-- Remove activeTab='create' button to send-btn place, maintaining app functionality -->
+                <div @click="activeTab = 'create'" class="absolute right-4 top-10 text-sm text-gray-400 cursor-pointer">
+                    Send
+                </div>
+            </div>
             
             <!-- List Content -->
-            <div class="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-24">
-                <!-- Yume Placeholder -->
-                <div class="bg-gradient-to-br from-sophia-fill/40 to-white p-4 rounded-sophia border border-sophia-border mb-6 shadow-soft cursor-pointer" @click="showDevToast()">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] font-bold text-sophia-accent tracking-[0.2em]">YUME THEME</span>
-                        <span class="text-[10px] text-sophia-title">预览 ▾</span>
-                    </div>
-                    <div class="h-14 bg-white/60 rounded-xl border border-dashed border-sophia-border/50 flex items-center justify-center text-xs text-gray-400">该功能正在开发中，敬请期待～</div>
-                </div>
+            <div class="flex-1 overflow-y-auto no-scrollbar pb-24">
                 
-                <!-- Sessions -->
-                <div class="space-y-5">
-                    <template x-for="session in sessions" :key="session.id">
-                        <div @click="openChat(session.id)" class="flex items-center gap-4 active:scale-[0.98] transition-all cursor-pointer">
-                            <div class="relative w-14 h-14 rounded-full border-2 border-sophia-border/50 p-0.5">
-                                <div class="w-full h-full rounded-full bg-sophia-fill bg-cover bg-center" :style="session.avatar ? `background-image: url(${$store.imageStore.get(session.avatar)})` : ''"></div>
-                                <template x-if="session.unread > 0">
-                                    <span class="absolute -top-1 -right-1 bg-sophia-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white" x-text="session.unread"></span>
-                                </template>
+                <!-- Cover Section -->
+                <div class="px-4 mt-1.5">
+                    <div class="bg-white rounded-[24px] overflow-hidden shadow-[0_10px_20px_rgba(255,133,178,0.05)]">
+                        <!-- Background Image Placeholder (Inline SVG for exact matching) -->
+                        <div class="h-[180px] bg-[#fdfdfd] border-b border-gray-50 flex items-center justify-center" style="background: #fdfdfd url('data:image/svg+xml;charset=UTF-8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22200%22><text x=%2250%25%22 y=%2250%25%22 font-size=%2220%22 fill=%22%23ddd%22 text-anchor=%22middle%22>i love u... ♡</text></svg>') center/cover"></div>
+                        
+                        <div class="px-5 pb-5 flex items-end -mt-9">
+                            <div class="w-[75px] h-[75px] rounded-full bg-gray-200 border-4 border-white shrink-0 shadow-sm overflow-hidden flex items-center justify-center">
+                                <!-- Using Sophia accent icon for default avatar -->
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FF91B9" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             </div>
-                            <div class="flex-1 border-b border-sophia-border/10 pb-4 overflow-hidden">
-                                <div class="flex justify-between items-center mb-1">
-                                    <div class="flex items-center gap-2 overflow-hidden">
-                                        <span class="font-semibold text-gray-800 text-[15px] truncate" x-text="session.name"></span>
-                                        <span x-show="session.tag" class="text-[9px] bg-sophia-title/20 text-sophia-accent px-1.5 py-0.5 rounded-md font-medium shrink-0" x-text="session.tag"></span>
-                                    </div>
-                                    <span class="text-[10px] text-gray-400 font-light shrink-0" x-text="formatTime(session.updatedAt)"></span>
+                            <div class="ml-3 mb-1">
+                                <p class="text-lg font-bold text-gray-800 m-0 leading-tight">@Qikasloen</p>
+                                <p class="text-xs text-gray-400 m-0 mt-0.5">#Pensée r%mpre</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unread Notice -->
+                <div class="px-5 py-4 flex justify-between items-center mt-2">
+                    <div class="text-[16px] font-medium flex items-center text-gray-900 gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        You have unread messages.
+                    </div>
+                    <div class="bg-black/5 px-2 py-0.5 rounded-full text-[10px] text-gray-500 flex items-center">🔗99+</div>
+                </div>
+
+                <!-- Sessions List -->
+                <div class="px-4 space-y-3">
+                    <template x-for="(session, index) in sessions" :key="session.id">
+                        <div @click="openChat(session.id)" class="bg-white rounded-2xl p-3 flex relative cursor-pointer active:scale-95 transition-transform shadow-sm border border-black/[0.02]">
+                            <!-- Avatar Section -->
+                            <div class="relative w-[52px] h-[52px] shrink-0">
+                                <div class="w-full h-full rounded-xl bg-gray-100 bg-cover bg-center border border-black/5" :style="session.avatar ? `background-image: url(${$store.imageStore.get(session.avatar)})` : ''"></div>
+                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-sophia-accent text-white text-[9px] px-1.5 py-px rounded-lg whitespace-nowrap shadow-sm">Follow</div>
+                            </div>
+                            
+                            <!-- Content Section -->
+                            <div class="ml-4 flex-1 min-w-0 pr-8">
+                                <div class="flex items-center mb-1.5">
+                                    <span class="text-[9px] px-2 py-px border border-gray-200 rounded-full text-gray-400 mr-2 shrink-0" x-text="index === 0 ? 'Pending' : (index === 1 ? 'Error' : 'Sent')"></span>
+                                    <span class="font-bold text-sm text-gray-900 truncate flex items-center gap-1">
+                                        <span x-text="session.name"></span>
+                                        <span x-show="session.tag === '✔'" class="text-sophia-accent text-xs">✔</span>
+                                        <span x-show="session.tag !== '✔' && session.tag" class="text-gray-400 text-xs" x-text="session.tag"></span>
+                                    </span>
                                 </div>
-                                <p class="text-[13px] text-gray-500 truncate w-full" x-text="session.lastMsg"></p>
+                                <div class="text-[13px] text-gray-500 leading-snug w-full truncate" x-text="session.lastMsg"></div>
+                            </div>
+                            
+                            <!-- Timestamp & Unread Badge -->
+                            <div class="absolute right-4 top-3 flex flex-col items-end gap-1">
+                                <div class="text-[11px] text-gray-400 font-medium" x-text="formatTime(session.updatedAt)"></div>
+                                <template x-if="session.unread > 0">
+                                    <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                                </template>
                             </div>
                         </div>
                     </template>
                 </div>
             </div>
             
-            <!-- Bottom Nav -->
-            <nav class="glass absolute bottom-0 w-full px-4 pt-4 pb-8 flex justify-around items-center border-t border-sophia-border/20">
-                <div class="flex flex-col items-center gap-1 text-sophia-accent cursor-pointer">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    <span class="text-[10px] font-medium">消息</span>
+            <!-- Bottom Floating Nav -->
+            <nav class="absolute bottom-6 left-5 right-5 h-16 bg-white/85 backdrop-blur-md rounded-full flex justify-around items-center px-4 shadow-[0_8px_25px_rgba(0,0,0,0.06)] z-40 transition-transform">
+                <div class="flex flex-col items-center cursor-pointer text-sophia-accent w-10">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></svg>
                 </div>
-                <div @click="showDevToast()" class="flex flex-col items-center gap-1 text-gray-300 cursor-pointer">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    <span class="text-[10px]">角色</span>
+                <div @click="showDevToast()" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 </div>
-                <div @click="showDevToast()" class="flex flex-col items-center gap-1 text-gray-300 cursor-pointer">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                    <span class="text-[10px]">朋友圈</span>
+                <!-- Middle Add Button (with red dot) -->
+                <div @click="showDevToast()" class="flex flex-col items-center cursor-pointer text-gray-400 w-10 relative">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                    <div class="absolute top-0 right-1 w-2 h-2 bg-sophia-accent rounded-full border border-white"></div>
                 </div>
-                <div @click="showDevToast()" class="flex flex-col items-center gap-1 text-gray-300 cursor-pointer">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
-                    <span class="text-[10px]">美化</span>
+                <div @click="showDevToast()" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 </div>
-                <div @click="activeTab = 'settings'" class="flex flex-col items-center gap-1 text-gray-300 cursor-pointer">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                    <span class="text-[10px]">我的</span>
+                <div @click="activeTab = 'settings'" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </div>
             </nav>
         </div>
         
         <!-- Chat Tab -->
-        <div x-show="activeTab === 'chat'" class="h-full flex flex-col relative transition-colors duration-500" :class="isOfflineMode ? (offlineTheme === 'midnight' ? 'bg-gray-900' : 'bg-[#F4EFE6]') : 'bg-sophia-bg'">
-            <header class="glass sticky top-0 z-20 px-4 pt-12 pb-4 flex justify-between items-center border-b" :class="isOfflineMode ? 'border-white/10' : 'border-sophia-border/20'">
-                <button @click="activeTab = 'list'" class="text-2xl font-light w-10 text-left" :class="isOfflineMode ? (offlineTheme === 'midnight' ? 'text-gray-300' : 'text-gray-600') : 'text-sophia-accent'">‹</button>
-                <div class="flex flex-col items-center">
-                    <div class="flex items-center gap-1.5">
-                        <span class="font-semibold" :class="isOfflineMode ? (offlineTheme === 'midnight' ? 'text-gray-200' : 'text-gray-800') : 'text-gray-800'" x-text="currentSession?.name"></span>
-                        <span x-show="!isOfflineMode" class="text-[10px] bg-sophia-border/30 px-1 rounded-sm text-sophia-accent font-bold cursor-pointer" @click="showDevToast()">📴</span>
-                    </div>
-                    <span x-show="isOfflineMode" class="text-[9px] px-1.5 py-0.5 rounded-sm mt-0.5" :class="offlineTheme === 'midnight' ? 'bg-white/10 text-gray-300' : 'bg-black/5 text-gray-500'">线下模式</span>
-                </div>
-                <div class="flex items-center justify-end w-16 gap-2">
-                    <button @click="toggleOfflineMode()" class="flex items-center justify-center transition-colors" :class="isOfflineMode ? 'text-yellow-400' : 'text-gray-400'">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <div x-show="activeTab === 'chat'" class="h-full flex flex-col relative transition-colors duration-500 bg-[#f5f5f5]" @click="if($event.target.closest('#add-btn') === null) panelOpen = false;">
+            <header class="chat-header bg-[#fdf2f7] px-4 py-3 flex justify-between items-center border-b border-black/5 shrink-0 relative z-20">
+                <div class="flex items-center gap-2.5">
+                    <button @click="activeTab = 'list'" class="text-gray-600">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
-                    <button @click="menuOpen = true" class="text-xl" :class="isOfflineMode ? (offlineTheme === 'midnight' ? 'text-gray-300' : 'text-gray-600') : 'text-sophia-accent'">≡</button>
+                    <div>
+                        <div class="font-bold text-sophia-accent text-[15px] flex items-center gap-1">
+                            <span x-text="currentSession?.name"></span>
+                            <span x-show="currentSession?.tag === '✔'">✔</span>
+                        </div>
+                        <div class="text-[10px] text-gray-400">❤1314 Followers</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button @click="menuOpen = true" class="text-gray-600">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <div class="w-9 h-9 rounded-full bg-gray-200 bg-cover bg-center border border-black/5" :style="currentSession?.avatar ? `background-image: url(${$store.imageStore.get(currentSession.avatar)})` : ''"></div>
                 </div>
             </header>
 
-            <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6 pb-4" x-ref="messageContainer">
+            <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-5 pb-4 flex flex-col pt-5" x-ref="messageContainer">
+                <div class="text-center text-[11px] text-gray-400 w-full mb-2">3/27 夜7:08</div>
                 <template x-for="(msg, index) in messages" :key="msg.id">
-                    <div>
+                    <div class="w-full flex flex-col" @contextmenu.prevent="openMessageMenu(msg)">
                         <!-- Bot Message -->
                         <template x-if="msg.role === 'assistant'">
-                            <div class="flex items-start gap-3" @contextmenu.prevent="openMessageMenu(msg)">
-                                <div class="w-10 h-10 rounded-full border flex-shrink-0 bg-cover bg-center" :class="isOfflineMode ? 'border-white/10 opacity-80' : 'bg-sophia-fill border-sophia-border'" :style="currentSession?.avatar ? `background-image: url(${$store.imageStore.get(currentSession.avatar)})` : ''"></div>
-                                <div class="relative p-3.5 rounded-2xl rounded-tl-none shadow-sm max-w-[240px] whitespace-pre-wrap flex flex-col gap-2"
-                                     :class="[
-                                        isOfflineMode ? (offlineTheme === 'midnight' ? 'bg-gray-800/80 text-gray-300 border border-white/5' : 'bg-white/60 text-gray-700 border border-black/5') : 'bg-sophia-bubbleBot text-gray-700',
-                                        isOfflineMode ? 'text-[15px] leading-loose font-serif tracking-wide' : 'text-[14px] leading-relaxed'
-                                     ]">
-                                    <div class="pet-badge" x-show="!isOfflineMode">🐾</div>
-                                    <span x-text="msg.content" x-show="msg.content"></span>
+                            <div class="flex flex-col items-start w-full self-start">
+                                <div class="bg-white border border-gray-200 rounded-md py-2 px-3.5 text-[13px] text-gray-800 leading-relaxed max-w-[85%] shadow-sm relative">
+                                    <span x-text="msg.content" x-show="msg.content && msg.type !== 'image'"></span>
                                     
-                                    <!-- EICS Cards -->
-                                    <template x-if="msg.eics && msg.eics.length > 0">
-                                        <div class="flex flex-col gap-2 mt-1">
-                                            <template x-for="(eics, eIdx) in msg.eics" :key="eIdx">
-                                                <div>
-                                                    <!-- Gift Card -->
-                                                    <template x-if="eics.eics_type === 'gift'">
-                                                        <div class="bg-white rounded-xl p-3 shadow-sm border border-sophia-border/30 flex flex-col items-center text-center">
-                                                            <div class="text-3xl mb-1" x-text="eics.icon || '🎁'"></div>
-                                                            <div class="font-bold text-gray-800 text-sm mb-1" x-text="eics.name"></div>
-                                                            <div class="text-[11px] text-gray-500 mb-3" x-text="eics.desc"></div>
-                                                            <template x-if="!eics.actionTaken">
-                                                                <div class="flex gap-2 w-full">
-                                                                    <button @click="acceptGift(msg, eIdx)" class="flex-1 bg-sophia-accent text-white text-xs py-1.5 rounded-lg font-medium">收下</button>
-                                                                    <button @click="rejectGift(msg, eIdx)" class="flex-1 bg-gray-100 text-gray-500 text-xs py-1.5 rounded-lg font-medium">婉拒</button>
-                                                                </div>
-                                                            </template>
-                                                            <template x-if="eics.actionTaken === 'accepted'">
-                                                                <div class="text-xs text-sophia-accent font-bold">已收下 ♡</div>
-                                                            </template>
-                                                            <template x-if="eics.actionTaken === 'rejected'">
-                                                                <div class="text-xs text-gray-400">已婉拒</div>
-                                                            </template>
-                                                        </div>
-                                                    </template>
-                                                    
-                                                    <!-- Diary Card -->
-                                                    <template x-if="eics.eics_type === 'diary'">
-                                                        <div class="bg-[#FDFBF7] rounded-xl p-4 shadow-sm border border-[#E8E0D5] relative overflow-hidden">
-                                                            <!-- Texture overlay -->
-                                                            <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: repeating-linear-gradient(transparent, transparent 23px, #D1C5B4 23px, #D1C5B4 24px); background-position: 0 12px;"></div>
-                                                            <div class="relative z-10">
-                                                                <div class="text-xs font-bold text-gray-500 mb-3 text-center tracking-widest" x-text="eics.date || new Date().toLocaleDateString()"></div>
-                                                                <div class="text-sm text-gray-700 leading-relaxed font-serif" x-html="eics.content ? eics.content.replace(/\n/g, '<br>') : ''"></div>
-                                                            </div>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </template>
+                                    <template x-if="msg.type === 'image'">
+                                        <!-- Stack implementation for incoming images if needed... -->
+                                        <div class="relative w-[180px] h-[240px] my-5 mx-auto">
+                                            <div class="absolute inset-0 bg-gray-200 rounded-xl border-[4px] border-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] -rotate-6 -left-2.5 z-[1]"></div>
+                                            <div class="absolute inset-0 bg-gray-200 rounded-xl border-[4px] border-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] rotate-3 left-1 z-[2]"></div>
+                                            <div class="absolute inset-0 bg-gray-300 rounded-xl border-[4px] border-white z-[3] bg-cover bg-center" :style="`background-image: url(${msg.content})`"></div>
                                         </div>
                                     </template>
+                                    
+                                    <div class="text-[9px] text-sophia-title mt-1">7:10 PM 翻译</div>
                                 </div>
                             </div>
                         </template>
                         
                         <!-- User Message -->
                         <template x-if="msg.role === 'user'">
-                            <div class="flex flex-row-reverse items-start gap-3" @contextmenu.prevent="openMessageMenu(msg)">
-                                <div class="w-10 h-10 rounded-full shadow-sm flex-shrink-0" :class="isOfflineMode ? (offlineTheme === 'midnight' ? 'bg-gray-700 border border-white/10' : 'bg-white border border-black/5') : 'bg-white border border-sophia-border/30'"></div>
-                                <div class="p-3.5 rounded-2xl rounded-tr-none shadow-jelly max-w-[240px] whitespace-pre-wrap"
-                                     :class="[
-                                        isOfflineMode ? (offlineTheme === 'midnight' ? 'bg-gray-700 text-gray-200 border border-white/10' : 'bg-white text-gray-800 border border-black/10') : 'bg-white text-gray-800 border border-sophia-border/20',
-                                        isOfflineMode ? 'text-[15px] leading-loose font-serif tracking-wide' : 'text-[14px] leading-relaxed'
-                                     ]">
-                                    <template x-if="msg.type === 'text'">
+                            <div class="flex flex-col items-end w-full self-end">
+                                <div class="text-[11px] text-gray-800 font-bold mb-1">：回復<span x-text="currentSession?.name"></span></div>
+                                <div class="bg-white border border-gray-200 rounded-md py-2 px-3.5 text-[13px] text-gray-800 leading-relaxed max-w-[85%] shadow-sm">
+                                    <template x-if="msg.type === 'image'">
+                                        <div class="relative w-[180px] h-[240px] my-2">
+                                            <div class="absolute inset-0 bg-gray-200 rounded-xl border-[4px] border-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] -rotate-6 -left-2.5 z-[1]"></div>
+                                            <div class="absolute inset-0 bg-gray-200 rounded-xl border-[4px] border-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] rotate-3 left-1 z-[2]"></div>
+                                            <div class="absolute inset-0 bg-gray-300 rounded-xl border-[4px] border-white z-[3] bg-cover bg-center" :style="`background-image: url(${msg.content})`"></div>
+                                            <div class="absolute -left-[60px] top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur px-2.5 py-1 rounded-[15px] text-[11px] border border-gray-200 z-[4]">Expand 6</div>
+                                        </div>
+                                    </template>
+                                    <template x-if="msg.type !== 'image'">
                                         <span x-text="msg.content"></span>
                                     </template>
-                                    <template x-if="msg.type === 'image'">
-                                        <img :src="$store.imageStore.get(msg.imageId)" class="max-w-[200px] rounded-xl" alt="Sent image">
-                                    </template>
+                                    <div class="text-[9px] text-gray-300 mt-1 flex justify-end items-center gap-1">
+                                        7:08 PM <span class="text-sophia-accent text-xs">✔</span>
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -4113,23 +4115,104 @@
                 </div>
             </div>
 
-            <div class="glass px-4 py-4 space-y-4 pb-10 border-t" :class="isOfflineMode ? 'border-white/5' : 'border-sophia-border/10'">
-                <div class="flex items-center gap-3">
-                    <button @click="panelOpen = !panelOpen" class="w-9 h-9 rounded-full flex items-center justify-center text-2xl transition-transform" :class="[panelOpen ? 'rotate-45' : '', isOfflineMode ? (offlineTheme === 'midnight' ? 'bg-gray-800 text-gray-400' : 'bg-white/50 text-gray-500') : 'bg-sophia-fill text-sophia-accent']">+</button>
-                    <input type="text" x-model="inputText" @keydown.enter="sendMessage()" class="flex-1 rounded-2xl px-4 py-2.5 text-sm outline-none" :class="isOfflineMode ? (offlineTheme === 'midnight' ? 'bg-gray-800 border border-white/10 text-gray-200 placeholder:text-gray-500' : 'bg-white/80 border border-black/10 text-gray-800 placeholder:text-gray-400') : 'bg-white border border-sophia-border/30 placeholder:text-gray-300'" placeholder="发送消息...">
-                    <button @click="sendMessage()" class="w-9 h-9 rounded-full flex items-center justify-center shadow-soft text-white text-sm shrink-0" :class="[{'opacity-50': !inputText.trim() || isGenerating}, isOfflineMode ? (offlineTheme === 'midnight' ? 'bg-gray-700' : 'bg-gray-800') : 'bg-sophia-accent']">✈︎</button>
+            <!-- Floating Extra Panel -->
+            <div x-show="panelOpen" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-5"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-5"
+                 class="absolute bottom-[90px] left-0 right-0 bg-[#fdf2f7]/85 backdrop-blur-xl border-t border-white/50 px-4 py-5 rounded-t-3xl z-50 grid grid-cols-5 gap-y-4 gap-x-2 shadow-[0_4px_20px_rgba(255,133,178,0.15)]"
+                 style="display: none;">
+                
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('image')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">图片</span>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('diary')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">一日一叙</span>
                 </div>
 
-                <div x-show="panelOpen" x-transition class="grid grid-cols-5 gap-y-5 pt-2">
-                    <template x-for="item in [
-                        {n:'图片', i:'🖼️', action: 'image'}, {n:'一日一叙', i:'✍️', action: 'diary'}, {n:'表情包', i:'🐱'}, {n:'位置', i:'📍'}, {n:'语音', i:'📞'},
-                        {n:'视频', i:'📹'}, {n:'EICS', i:'🧬'}, {n:'小狗法庭', i:'⚖️', action: 'court'}, {n:'礼物', i:'🎁', action: 'gift'}, {n:'参考', i:'💡'}
-                    ]">
-                        <div class="flex flex-col items-center gap-1.5 active:scale-90 transition-transform cursor-pointer" @click="handlePanelAction(item.action)">
-                            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-sophia-border/20 text-xl" x-text="item.i"></div>
-                            <span class="text-[10px] text-gray-500 font-medium" x-text="item.n"></span>
-                        </div>
-                    </template>
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('sticker')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">表情包</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('location')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">位置</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('voice')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">语音</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('video')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">视频</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('eics')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">EICS</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('court')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M12 4v17"/><path d="M12 4L4 8"/><path d="M12 4l8 4"/><path d="M4 8v5a4 4 0 0 0 8 0V8"/><path d="M20 8v5a4 4 0 0 1-8 0V8"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">小狗法庭</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('gift')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">礼物</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('reference')">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21h6"/><path d="M10.5 21v-4"/><path d="M13.5 21v-4"/><path d="M12 17a5 5 0 1 0-5-5 5.5 5.5 0 0 0 2 4.2C9.5 16.5 10 17 12 17z"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-medium whitespace-nowrap">参考</span>
+                </div>
+            </div>
+
+            <!-- Chat Footer -->
+            <div class="chat-footer bg-[#fdf2f7] px-4 py-3 border-t border-[#eadbe3] shrink-0 relative z-50 rounded-b-3xl">
+                <!-- Top labels -->
+                <div class="flex justify-between px-6 mb-2">
+                    <span class="text-sophia-accent border-b-2 border-sophia-accent text-xs font-medium pb-0.5">Chat</span>
+                    <span class="text-gray-400 text-xs">Email</span>
+                    <span class="text-gray-400 text-xs">Note</span>
+                    <span class="text-gray-400 text-xs">Own</span>
+                </div>
+                
+                <div class="flex items-center gap-3 bg-white rounded-md px-3 py-2 border border-[#e0c8d1]">
+                    <div id="add-btn" class="cursor-pointer transition-transform duration-300" :class="{'rotate-45': panelOpen}" @click="panelOpen = !panelOpen">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </div>
+                    <input type="text" x-model="inputText" @keydown.enter="sendMessage()" class="flex-1 bg-transparent border-none outline-none text-sm text-gray-800 placeholder-gray-300" placeholder="">
+                    <span class="text-gray-400 text-sm cursor-pointer font-medium" :class="{'text-sophia-accent': inputText.trim() && !isGenerating}" @click="sendMessage()">Send</span>
                 </div>
             </div>
         </div>
@@ -4233,55 +4316,140 @@
         </div>
 
         <!-- Top Right Menu -->
-        <div x-show="menuOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
-             class="absolute inset-0 z-50 bg-sophia-bg flex flex-col" style="display: none;">
-            <header class="pt-12 px-6 pb-4 flex justify-between items-center border-b border-sophia-border/10">
-                <button @click="menuOpen = false" class="text-sophia-accent font-medium">返回</button>
-                <span class="font-bold text-gray-700">聊天详情</span>
-                <div class="w-8"></div>
-            </header>
+        <div x-show="menuOpen" 
+             class="absolute inset-0 z-40 bg-black/20" 
+             style="display: none;"
+             x-transition:opacity
+             @click="menuOpen = false"></div>
 
-            <div class="flex-1 overflow-y-auto no-scrollbar px-6 space-y-8 pb-10">
-                <div class="flex justify-center items-center gap-10 py-10">
-                    <div class="flex flex-col items-center gap-3">
-                        <div class="w-20 h-20 rounded-full bg-sophia-fill border-[5px] border-white shadow-soft bg-cover bg-center" :style="currentSession?.avatar ? `background-image: url(${$store.imageStore.get(currentSession.avatar)})` : ''"></div>
-                        <span class="text-xs font-bold text-gray-600 bg-sophia-fill/50 px-3 py-1 rounded-full" x-text="currentSession?.name"></span>
+        <nav x-show="menuOpen"
+             style="display: none;"
+             x-transition:enter="transition transform duration-300 ease-out"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition transform duration-300 ease-in"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             class="absolute top-0 right-0 w-[85%] h-full bg-white/85 backdrop-blur-[25px] shadow-2xl z-50 flex flex-col no-scrollbar overflow-y-auto border-l border-white/50">
+
+            <div class="pt-14 pb-8 px-6 flex flex-col relative shrink-0">
+                <button @click="menuOpen = false" class="absolute top-12 left-5 text-[#ff85b2]/80">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+
+                <div class="flex items-center justify-around mt-6">
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-16 h-16 rounded-full shadow-[0_2px_10px_rgba(255,133,178,0.2)] border-[3px] border-white bg-cover bg-center" :style="currentSession?.avatar ? `background-image: url(${$store.imageStore.get(currentSession.avatar)})` : 'background-color: white'"></div>
+                        <span class="text-[11px] font-bold text-gray-700" x-text="currentSession?.name || '井侑漱'"></span>
                     </div>
-                    <div class="text-sophia-border animate-pulse">⇆</div>
-                    <div class="flex flex-col items-center gap-3">
-                        <div class="w-20 h-20 rounded-full bg-white border-[5px] border-sophia-border shadow-soft"></div>
-                        <span class="text-xs font-bold text-gray-600 bg-white px-3 py-1 rounded-full">我</span>
+                    
+                    <div class="text-[#ff85b2] opacity-80 text-xl animate-pulse">❤</div>
+                    
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-16 h-16 rounded-full bg-white shadow-[0_2px_10px_rgba(255,133,178,0.2)] border-[3px] border-white bg-cover bg-center" :style="dressUp.avatar.imgUrl ? `background-image: url(${$store.imageStore.get(dressUp.avatar.imgUrl)})` : ''"></div>
+                        <span class="text-[11px] font-bold text-gray-700">You</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="space-y-8">
-                    <section>
-                        <h3 class="text-[11px] text-sophia-title font-bold mb-3 tracking-[0.15em] uppercase">互动设置</h3>
-                        <div class="bg-white rounded-sophia overflow-hidden border border-sophia-border/20 shadow-sm text-sm">
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between items-center">
-                                <span>线下模式主题</span>
-                                <select x-model="offlineTheme" @change="saveP1Data()" class="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none text-sophia-accent font-medium">
-                                    <option value="midnight">午夜书房</option>
-                                    <option value="afternoon">午后花园</option>
-                                </select>
-                            </div>
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between" @click="showDevToast()"><span>戳一戳文案</span><span class="text-gray-400">设置 ›</span></div>
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between" @click="showDevToast()"><span>指定置顶</span><span class="text-gray-400">未设置 ›</span></div>
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between" @click="showDevToast()"><span>小狗法庭频率</span><span class="text-sophia-accent font-medium">中等频率</span></div>
-                            <div class="px-5 py-4 flex justify-between" @click="showDevToast()"><span>角色送礼物开关</span><span class="text-sophia-accent font-medium">已开启</span></div>
+            <div class="flex-1 px-4 space-y-6 pb-20" x-data="{ 
+                groups: [
+                    { 
+                        title: '角色与用户', 
+                        items: [
+                            { name: '角色设置', sub: '昵称、头像、标签、生日' },
+                            { name: '我的设置', sub: '编辑个人资料' },
+                            { name: '双方备注', sub: '修改显示名与系统称呼' }
+                        ]
+                    },
+                    { 
+                        title: '界面美化', 
+                        items: [
+                            { name: '横屏模式', sub: '开启/关闭横屏', toggle: true, model: 'isLandscape' },
+                            { name: '聊天背景', sub: '设置当前背景图 (URL)' },
+                            { name: '聊天气泡', sub: '前往 Yume 美化面板' },
+                            { name: 'CSS自定义', sub: '实时代码注入' }
+                        ]
+                    },
+                    { 
+                        title: '互动设置', 
+                        items: [
+                            { name: '线下主题模式', sub: '午夜书房 / 午后花园', action: 'toggleTheme' },
+                            { name: '戳一戳文案', sub: '自定义头像点击反馈' },
+                            { name: '指定置顶', sub: '置顶当前会话', toggle: true },
+                            { name: '小狗法庭频率', sub: '经常' },
+                            { name: '角色送礼物开关', sub: '角色主动送礼互动', toggle: true, state: true }
+                        ]
+                    },
+                    { 
+                        title: '功能', 
+                        items: [
+                            { name: '搜索聊天记录', sub: '关键词搜索历史' },
+                            { name: '导出与导入', sub: 'JSON数据备份/恢复' },
+                            { name: '筛选会话', sub: '按图片或日期筛选' },
+                            { name: '全局记忆设置', sub: '自动提取开关' },
+                            { name: '记忆管理', sub: '核心记忆与今日摘要', action: 'memory' },
+                            { name: '清空对话', sub: '清除对话记录', dangerous: true }
+                        ]
+                    }
+                ]
+            }">
+                <template x-for="group in groups">
+                    <div class="space-y-2">
+                        <h3 class="px-4 text-[10px] font-bold text-[#ff85b2] tracking-[0.2em] uppercase" x-text="group.title"></h3>
+                        
+                        <div class="bg-gray-50/50 rounded-[22px] overflow-hidden border border-gray-100 shadow-sm relative z-10">
+                            <template x-for="item in group.items">
+                                <div @click="
+                                        if(item.dangerous) { showClearModal = true; }
+                                        else if(item.action === 'memory') { showMemoryManager = true; menuOpen = false; }
+                                        else if(item.action === 'toggleTheme') { offlineTheme = offlineTheme === 'midnight' ? 'afternoon' : 'midnight'; item.sub = offlineTheme === 'midnight' ? '午夜书房' : '午后花园'; saveP1Data();UIManager.showToast('主题已切换为 ' + item.sub); }
+                                        else if(item.model === 'isLandscape') { isLandscape = !isLandscape; }
+                                        else if(item.toggle && item.model !== 'isLandscape') { item.state = !item.state; }
+                                        else { showDevToast() }
+                                     "
+                                     class="group flex items-center justify-between p-4 border-b border-gray-100 last:border-0 active:bg-[#fdf2f7]/60 transition-colors cursor-pointer">
+                                    <div class="flex-1">
+                                        <div class="text-[13.5px] font-semibold" :class="item.dangerous ? 'text-red-400' : 'text-gray-700'" x-text="item.name"></div>
+                                        <div class="text-[9px] text-gray-400 mt-0.5 tracking-wide" x-text="item.sub"></div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <template x-if="item.toggle">
+                                            <div class="w-9 h-5 flex items-center rounded-full p-1 duration-300" 
+                                                 :class="(item.model === 'isLandscape' ? isLandscape : item.state) ? 'bg-[#ff85b2]' : 'bg-gray-200'">
+                                                <div class="bg-white w-3 h-3 rounded-full shadow-sm transform duration-300"
+                                                     :class="(item.model === 'isLandscape' ? isLandscape : item.state) ? 'translate-x-4' : 'translate-x-0'"></div>
+                                            </div>
+                                        </template>
+                                        <template x-if="!item.toggle">
+                                            <svg class="w-4 h-4 text-gray-300 group-active:text-[#ff85b2]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
-                    </section>
+                    </div>
+                </template>
+            </div>
 
-                    <section>
-                        <h3 class="text-[11px] text-sophia-title font-bold mb-3 tracking-[0.15em] uppercase">功能管理</h3>
-                        <div class="bg-white rounded-sophia overflow-hidden border border-sophia-border/20 shadow-sm text-sm">
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between" @click="showDevToast()"><span>搜索记录</span><span class="text-gray-300">›</span></div>
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between" @click="showDevToast()"><span>导出与导入</span><span class="text-gray-300">›</span></div>
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between" @click="showDevToast()"><span>筛选会话</span><span class="text-gray-300">›</span></div>
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between" @click="showMemoryManager = true"><span>记忆管理</span><span class="text-gray-300">›</span></div>
-                            <div class="px-5 py-4 border-b border-sophia-border/5 flex justify-between text-red-500" @click="clearHistory()"><span>清空对话</span><span class="text-gray-300">›</span></div>
-                        </div>
-                    </section>
+            <div class="pb-4 shrink-0">
+                <div class="w-32 h-1 bg-[#ff85b2]/30 rounded-full mx-auto"></div>
+            </div>
+        </nav>
+        
+        <!-- Clear Chat Modal -->
+        <div x-show="showClearModal" class="absolute inset-0 z-[60] flex items-center justify-center px-10" style="display: none;">
+            <div x-show="showClearModal" x-transition:opacity @click="showClearModal = false" class="absolute inset-0 bg-[#ff85b2]/20 backdrop-blur-sm shadow-xl"></div>
+            <div x-show="showClearModal" x-transition:enter="transition scale-90 opacity-0 duration-200" x-transition:enter-end="scale-100 opacity-100" x-transition:leave="transition scale-90 opacity-0 duration-200"
+                 class="relative bg-white/95 rounded-[30px] w-full max-w-sm shadow-2xl text-center p-8 border border-white">
+                <div class="w-12 h-12 bg-red-50 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </div>
+                <h4 class="text-md font-bold text-gray-800">清空对话</h4>
+                <p class="text-xs text-gray-500 mt-2 leading-relaxed">确定清空与该角色的所有记录吗？<br>此操作无法找回喔。</p>
+                <div class="flex gap-3 mt-8">
+                    <button @click="showClearModal = false" class="flex-1 py-3 bg-gray-50 rounded-2xl text-gray-400 text-sm font-semibold">再想想</button>
+                    <button @click="clearHistory()" class="flex-1 py-3 bg-red-400 rounded-2xl text-white text-sm font-bold shadow-lg shadow-red-200">确定清空</button>
                 </div>
             </div>
         </div>
@@ -6016,12 +6184,16 @@
             }, 2500);
           }
         };
+        window.UIManager = UIManager;
 
         document.addEventListener('alpine:init', () => {
             Alpine.data('chatApp', () => ({
                 activeTab: 'list', // 'list', 'chat', 'create', 'settings'
                 panelOpen: false,
                 menuOpen: false,
+                showClearModal: false,
+                showMemoryManager: false,
+                isLandscape: false,
                 msgMenuOpen: false,
                 selectedMsg: null,
                 
@@ -6156,9 +6328,7 @@
                 toggleOfflineMode() {
                     if (this.isOfflineMode) {
                         // Exiting offline mode
-                        if (confirm('是否生成剧情总结？')) {
-                            this.generateOfflineSummary();
-                        }
+                        this.generateOfflineSummary();
                         this.isOfflineMode = false;
                     } else {
                         // Entering offline mode
@@ -6652,7 +6822,7 @@ ${todayMsgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}: $
                 
                 markAsCoreMemory() {
                     if (this.selectedMsg) {
-                        const content = prompt('编辑要保存的记忆内容：', this.selectedMsg.content);
+                        const content = this.selectedMsg.content;
                         if (content) {
                             this.coreMemories.push({
                                 id: 'mem_' + Date.now(),
@@ -6966,13 +7136,12 @@ ${msgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}: ${m.co
                 },
                 
                 clearHistory() {
-                    if (confirm('确定清空所有对话记录吗？此操作不可撤销。')) {
-                        this.messages = [];
-                        this.saveMessages();
-                        this.updateSessionLastMsg('');
-                        this.menuOpen = false;
-                        UIManager.showToast('对话已清空');
-                    }
+                    this.messages = [];
+                    this.saveMessages();
+                    this.updateSessionLastMsg('');
+                    this.menuOpen = false;
+                    this.showClearModal = false;
+                    UIManager.showToast('对话已清空');
                 }
             }));
         });
