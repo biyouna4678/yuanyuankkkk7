@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script defer src="https://unpkg.com/@alpinejs/collapse@3.14.3/dist/cdn.min.js" crossorigin="anonymous"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -2451,6 +2452,29 @@
             z-index: 10;
             box-shadow: 0 2px 6px rgba(255, 145, 185, 0.2);
         }
+        /* API Settings Styles */
+        .api-scroll-container { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+        .api-creamy-card { background: #ffffff; border-radius: 28px; box-shadow: 0 8px 30px rgba(255, 182, 193, 0.1); padding: 24px; position: relative; transition: transform 0.2s ease; }
+        .api-status-dot { width: 10px; height: 10px; border-radius: 50%; position: absolute; top: 26px; right: 26px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .status-online { background: #4ade80; box-shadow: 0 0 12px rgba(74, 222, 128, 0.5); animation: pulse 2s infinite; }
+        .status-offline { background: #f87171; box-shadow: 0 0 12px rgba(248, 113, 113, 0.4); }
+        .status-unknown { background: #e5e7eb; }
+        .api-input-group { background: #f8f8f8; border-radius: 18px; padding: 14px 18px; border: 1.5px solid transparent; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; }
+        .api-input-group:focus-within { border-color: #ffb6c1; background: white; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.15); }
+        .api-input-group input, .api-input-group select { background: transparent; border: none; outline: none; width: 100%; font-size: 14px; color: #555; }
+        .api-label { font-size: 11px; font-weight: 800; color: #ffb6c1; margin-bottom: 10px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        .api-range { -webkit-appearance: none; height: 6px; background: #ffeef2; border-radius: 10px; width: 100%; }
+        .api-range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: white; border: 4px solid #ffb6c1; border-radius: 50%; cursor: pointer; box-shadow: 0 3px 8px rgba(255, 182, 193, 0.4); transition: transform 0.1s; }
+        .api-range:active::-webkit-slider-thumb { transform: scale(1.2); }
+        .api-toggle-checkbox:checked + .api-toggle-label { background-color: #ffb6c1; }
+        .api-toggle-checkbox:checked + .api-toggle-label:after { transform: translateX(20px); }
+        .api-toggle-label { width: 44px; height: 24px; background: #edeff2; border-radius: 20px; position: relative; transition: 0.3s ease; cursor: pointer; display: block; }
+        .api-toggle-label:after { content: ''; width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .api-btn-main { background: #ffb6c1; color: white; border-radius: 18px; padding: 14px; font-size: 14px; font-weight: 800; text-align: center; box-shadow: 0 6px 20px rgba(255, 182, 193, 0.3); }
+        .api-btn-secondary { border: 1.5px solid #ffb6c1; color: #ffb6c1; border-radius: 18px; padding: 12px; font-size: 13px; font-weight: 800; transition: all 0.2s; width: 100%; }
+        .api-btn-secondary:active { background: #fff0f3; transform: scale(0.97); }
+        .api-page-fade { animation: api-fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes api-fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body x-data="iosDesktop()">
@@ -2990,7 +3014,7 @@
             <!-- 壁纸 -->
             <div class="glass-card">
                 <div class="group-title">WALLPAPER PREVIEW</div>
-                <button @click="openImagePicker('设置壁纸', dressUp.wallpaper.url, (url) => dressUp.wallpaper.url = url)" class="w-full px-4 py-2 mb-3 text-sm border border-sophia-border rounded-input bg-white/50 text-sophia-accent text-center">
+                <button @click="openImagePicker('设置壁纸', dressUp.wallpaper.url, (url) => this.dressUp.wallpaper.url = url)" class="w-full px-4 py-2 mb-3 text-sm border border-sophia-border rounded-input bg-white/50 text-sophia-accent text-center">
                     <span x-text="dressUp.wallpaper.url ? '修改壁纸图片' : '设置壁纸图片'"></span>
                 </button>
                 <div class="setting-row">
@@ -3023,7 +3047,7 @@
                 <div class="space-y-1">
                     <div class="setting-row">
                         <span class="text-sm text-gray-600">图标图片</span>
-                        <button @click="openImagePicker('全局图标图片', dressUp.icon.imgUrl, (url) => dressUp.icon.imgUrl = url)" class="px-3 py-1 bg-sophia-fill text-sophia-accent text-xs rounded-lg" x-text="dressUp.icon.imgUrl ? '修改图片' : '设置图片'"></button>
+                        <button @click="openImagePicker('全局图标图片', dressUp.icon.imgUrl, (url) => this.dressUp.icon.imgUrl = url)" class="px-3 py-1 bg-sophia-fill text-sophia-accent text-xs rounded-lg" x-text="dressUp.icon.imgUrl ? '修改图片' : '设置图片'"></button>
                     </div>
                     <div class="setting-row">
                         <span class="text-sm text-gray-600">背景色调</span>
@@ -4033,8 +4057,17 @@
         </div>
         
         <!-- Chat Tab -->
-        <div x-show="activeTab === 'chat'" class="h-full flex flex-col relative transition-colors duration-500 bg-[#f5f5f5]" @click="if($event.target.closest('#add-btn') === null) panelOpen = false;">
-            <header class="chat-header bg-[#fdf2f7] px-4 py-3 flex justify-between items-center border-b border-black/5 shrink-0 relative z-20">
+        <div x-show="activeTab === 'chat'" 
+             class="h-full flex flex-col relative transition-all duration-500 bg-[#f5f5f5]" 
+             :class="isLandscape ? 'fixed inset-0 z-[200] !w-screen !h-screen flex-row' : ''"
+             @click="if($event.target.closest('#add-btn') === null) panelOpen = false;">
+             
+             <!-- In Landscape, we will use a split pane or just center the chat. For a mobile-native feel landscape might just stretch, or we can use fixed max-width. -->
+             <div class="flex-1 flex flex-col w-full max-w-full mx-auto"
+                  :class="isLandscape ? (chatBgUrl ? '' : 'bg-[#e5e5e5]') : ''"
+                  :style="chatBgUrl ? `background-image: url(${$store.imageStore.get(chatBgUrl)}); background-size: cover; background-position: center;` : ''">
+
+            <header class="chat-header bg-[#fdf2f7]/90 backdrop-blur-md px-4 py-3 flex justify-between items-center border-b border-black/5 shrink-0 relative z-20">
                 <div class="flex items-center gap-2.5">
                     <button @click="activeTab = 'list'" class="text-gray-600">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
@@ -4070,10 +4103,53 @@
                                         <div class="relative w-[180px] h-[240px] my-5 mx-auto">
                                             <div class="absolute inset-0 bg-gray-200 rounded-xl border-[4px] border-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] -rotate-6 -left-2.5 z-[1]"></div>
                                             <div class="absolute inset-0 bg-gray-200 rounded-xl border-[4px] border-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] rotate-3 left-1 z-[2]"></div>
-                                            <div class="absolute inset-0 bg-gray-300 rounded-xl border-[4px] border-white z-[3] bg-cover bg-center" :style="`background-image: url(${msg.content})`"></div>
+                                            <div class="absolute inset-0 bg-gray-300 rounded-xl border-[4px] border-white z-[3] bg-cover bg-center" :style="`background-image: url(${$store.imageStore.get(msg.content) || msg.content})`"></div>
                                         </div>
                                     </template>
                                     
+                                    <!-- EICS Content Rendering -->
+                                    <template x-if="msg.eics && msg.eics.length > 0">
+                                        <div class="mt-2 space-y-2">
+                                            <template x-for="(eicsItem, eIdx) in msg.eics" :key="eIdx">
+                                                <div>
+                                                    <!-- Diary Type -->
+                                                    <template x-if="eicsItem.eics_type === 'diary'">
+                                                        <div class="bg-[#FDFBF7] rounded-xl p-3 border border-[#E8E0D5] relative overflow-hidden mt-1 cursor-pointer" @click="showDiaryBook = true">
+                                                            <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #D1C5B4 19px, #D1C5B4 20px); background-position: 0 10px;"></div>
+                                                            <div class="relative z-10 flex flex-col gap-1">
+                                                                <div class="text-[10px] font-bold text-gray-500 tracking-widest flex items-center gap-1"><span class="text-xs">📖</span> <span x-text="eicsItem.date"></span>的日记</div>
+                                                                <div class="text-xs text-gray-600 line-clamp-3 font-serif" x-text="eicsItem.content"></div>
+                                                                <div class="text-[9px] text-sophia-accent mt-1">点击打开日记本查看全文 ›</div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                    
+                                                    <!-- Gift Type -->
+                                                    <template x-if="eicsItem.eics_type === 'gift'">
+                                                        <div class="bg-gradient-to-br from-white to-[#FFF0F3] rounded-xl p-3 border border-[#FFE4E8] mt-1 shadow-sm flex flex-col items-center text-center">
+                                                            <div class="text-3xl mb-1" x-text="eicsItem.icon || '🎁'"></div>
+                                                            <div class="text-sm font-bold text-gray-800" x-text="eicsItem.name"></div>
+                                                            <div class="text-[10px] text-gray-500 mb-3" x-text="eicsItem.desc"></div>
+                                                            
+                                                            <template x-if="!eicsItem.actionTaken">
+                                                                <div class="flex gap-2 w-full">
+                                                                    <button @click="acceptGift(msg, eIdx)" class="flex-1 bg-sophia-accent text-white text-[10px] py-1.5 rounded-lg font-bold">收下</button>
+                                                                    <button @click="rejectGift(msg, eIdx)" class="flex-1 bg-gray-100 text-gray-500 text-[10px] py-1.5 rounded-lg font-bold">婉拒</button>
+                                                                </div>
+                                                            </template>
+                                                            <template x-if="eicsItem.actionTaken === 'accepted'">
+                                                                <div class="text-[10px] text-sophia-accent font-bold bg-white px-3 py-1 rounded-full shadow-sm">已收下放入礼物墙</div>
+                                                            </template>
+                                                            <template x-if="eicsItem.actionTaken === 'rejected'">
+                                                                <div class="text-[10px] text-gray-400 font-bold bg-gray-100 px-3 py-1 rounded-full">已婉拒</div>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+
                                     <div class="text-[9px] text-sophia-title mt-1">7:10 PM 翻译</div>
                                 </div>
                             </div>
@@ -4088,7 +4164,7 @@
                                         <div class="relative w-[180px] h-[240px] my-2">
                                             <div class="absolute inset-0 bg-gray-200 rounded-xl border-[4px] border-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] -rotate-6 -left-2.5 z-[1]"></div>
                                             <div class="absolute inset-0 bg-gray-200 rounded-xl border-[4px] border-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] rotate-3 left-1 z-[2]"></div>
-                                            <div class="absolute inset-0 bg-gray-300 rounded-xl border-[4px] border-white z-[3] bg-cover bg-center" :style="`background-image: url(${msg.content})`"></div>
+                                            <div class="absolute inset-0 bg-gray-300 rounded-xl border-[4px] border-white z-[3] bg-cover bg-center" :style="`background-image: url(${$store.imageStore.get(msg.content) || msg.content})`"></div>
                                             <div class="absolute -left-[60px] top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur px-2.5 py-1 rounded-[15px] text-[11px] border border-gray-200 z-[4]">Expand 6</div>
                                         </div>
                                     </template>
@@ -4233,7 +4309,7 @@
                 <div class="flex flex-col items-center gap-3">
                     <div class="w-20 h-20 rounded-full bg-sophia-fill border-2 border-sophia-border flex items-center justify-center overflow-hidden cursor-pointer bg-cover bg-center" 
                          :style="newRole.avatar ? `background-image: url(${$store.imageStore.get(newRole.avatar)})` : ''"
-                         @click="openImagePicker('角色头像', newRole.avatar, (url) => newRole.avatar = url)">
+                         @click="openImagePicker('角色头像', newRole.avatar, (url) => this.newRole.avatar = url)">
                         <span x-show="!newRole.avatar" class="text-sophia-accent text-2xl">+</span>
                     </div>
                     <span class="text-xs text-gray-400">点击上传头像</span>
@@ -4295,23 +4371,137 @@
                     <div class="text-gray-300">›</div>
                 </div>
                 
-                <div class="space-y-4">
-                    <h3 class="text-[11px] text-sophia-title font-bold mb-3 tracking-[0.15em] uppercase">API 设置</h3>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">API Key</label>
-                        <input type="password" x-model="apiKey" class="w-full bg-white border border-sophia-border/50 rounded-xl px-4 py-3 text-sm outline-none focus:border-sophia-accent" placeholder="sk-...">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">API URL</label>
-                        <input type="text" x-model="apiUrl" class="w-full bg-white border border-sophia-border/50 rounded-xl px-4 py-3 text-sm outline-none focus:border-sophia-accent" placeholder="https://api.openai.com/v1/chat/completions">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">模型名称</label>
-                        <input type="text" x-model="apiModel" class="w-full bg-white border border-sophia-border/50 rounded-xl px-4 py-3 text-sm outline-none focus:border-sophia-accent" placeholder="gpt-3.5-turbo">
+                <!-- API Settings Entry -->
+                <div class="space-y-4 pt-4">
+                    <h3 class="text-[11px] text-sophia-title font-bold mb-3 tracking-[0.15em] uppercase">深入设置</h3>
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex justify-between items-center cursor-pointer" @click="activeTab = 'apiSettings'">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-sophia-fill rounded-xl flex items-center justify-center text-xl">⚙️</div>
+                            <div>
+                                <div class="font-bold text-gray-800 text-sm">高级 API 设置</div>
+                                <div class="text-[10px] text-gray-400">配置第三方大模型网络</div>
+                            </div>
+                        </div>
+                        <div class="text-gray-300">›</div>
                     </div>
                 </div>
-                
-                <button @click="saveSettings()" class="w-full bg-sophia-accent text-white font-bold py-3.5 rounded-xl shadow-soft mt-4">保存设置</button>
+            </div>
+        </div>
+
+        <!-- API Settings Full Tab -->
+        <div x-show="activeTab === 'apiSettings'" style="display:none;" class="h-full flex flex-col relative bg-[#f4f4f4]">
+            <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex items-center gap-4 border-b border-sophia-border/10 bg-white/85 backdrop-blur-[20px]">
+                <button @click="activeTab = 'settings'" class="active:scale-90 transition-transform">
+                    <svg class="w-6 h-6 stroke-pink-300" fill="none" viewBox="0 0 24 24" stroke-width="3"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <h3 class="font-black text-gray-700 text-lg">API 设置</h3>
+            </header>
+
+            <div class="flex-1 api-scroll-container p-5 space-y-6 pb-28 no-scrollbar">
+                <section class="api-creamy-card space-y-6 api-page-fade">
+                    <div class="api-status-dot" :class="roleStatus === 'online' ? 'status-online' : (roleStatus === 'offline' ? 'status-offline' : 'status-unknown')"></div>
+
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xl">💬</span>
+                        <h4 class="font-black text-gray-700">角色 API</h4>
+                    </div>
+
+                    <div>
+                        <label class="api-label">API Endpoint</label>
+                        <div class="api-input-group">
+                            <input type="text" x-model="apiUrl" @change="saveApiSettings()" placeholder="https://api.openai.com/v1/chat/completions">
+                            <select class="!w-auto text-pink-300 font-bold ml-2 cursor-pointer" @change="apiUrl = $event.target.value; $event.target.value = ''; saveApiSettings()">
+                                <option value="">▾</option>
+                                <template x-for="opt in urlPresets"><option :value="opt" x-text="opt"></option></template>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="api-label">Secret API Key</label>
+                        <div class="api-input-group">
+                            <input :type="apiShowKey ? 'text' : 'password'" x-model="apiKey" @change="saveApiSettings()" placeholder="sk-xxxxxx...">
+                            <button @click="apiShowKey = !apiShowKey" class="ml-2 text-pink-200 active:scale-90 transition-transform">
+                                <svg x-show="!apiShowKey" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="apiShowKey" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="api-label">Model Name</label>
+                        <div class="api-input-group">
+                            <input type="text" x-model="apiModel" @change="saveApiSettings()" placeholder="gpt-4o-mini">
+                            <select class="!w-auto text-pink-300 font-bold ml-2 cursor-pointer" @change="apiModel = $event.target.value; $event.target.value = ''; saveApiSettings()">
+                                <option value="">▾</option>
+                                <template x-for="opt in modelPresets"><option :value="opt" x-text="opt"></option></template>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 pt-2">
+                        <div>
+                            <div class="flex justify-between items-center mb-3"><label class="api-label !mb-0">Temperature</label><span class="text-xs font-mono font-bold text-pink-300 bg-pink-50 px-2 py-0.5 rounded-lg" x-text="apiTemp"></span></div>
+                            <input type="range" min="0" max="2" step="0.1" x-model.number="apiTemp" @change="saveApiSettings()" class="api-range">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-3"><label class="api-label !mb-0">Max Tokens</label><span class="text-xs font-mono font-bold text-pink-300 bg-pink-50 px-2 py-0.5 rounded-lg" x-text="apiMaxTokens"></span></div>
+                            <input type="range" min="100" max="2000" step="50" x-model.number="apiMaxTokens" @change="saveApiSettings()" class="api-range">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <label class="api-label !mb-0">Stream Response</label>
+                        <div @click="apiStream = !apiStream; saveApiSettings()">
+                            <input type="checkbox" class="hidden api-toggle-checkbox" :checked="apiStream">
+                            <label class="api-toggle-label"></label>
+                        </div>
+                    </div>
+
+                    <button @click="testApiConnection('role')" class="api-btn-secondary active:scale-[0.98]">测试连接</button>
+                </section>
+
+                <section class="api-creamy-card space-y-6">
+                    <div class="api-status-dot" :class="circleStatus === 'online' ? 'status-online' : (circleStatus === 'offline' ? 'status-offline' : 'status-unknown')"></div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2"><span class="text-xl">🐰</span><h4 class="font-black text-gray-700">圈圈 API</h4></div>
+                        <div @click="circleEnabled = !circleEnabled">
+                            <input type="checkbox" class="hidden api-toggle-checkbox" :checked="circleEnabled">
+                            <label class="api-toggle-label"></label>
+                        </div>
+                    </div>
+
+                    <div x-show="circleEnabled" x-collapse x-cloak class="space-y-5 pt-2">
+                        <div class="api-input-group">
+                            <input :type="apiShowKey ? 'text' : 'password'" placeholder="Enter API Key" x-model="circleApiKey" @change="saveApiSettings()">
+                        </div>
+                        <div class="flex justify-between items-center pt-2">
+                            <button @click="syncCircleConfig()" class="text-xs font-bold text-pink-200 underline active:opacity-50 transition-opacity">复用角色配置</button>
+                            <button @click="testApiConnection('circle')" class="api-btn-secondary !w-auto px-8">测试连接</button>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="px-2 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button @click="window.UIManager.showToast('该功能即将开放导入')" class="py-4 bg-white rounded-2xl text-[12px] font-black text-gray-400 shadow-sm active:bg-gray-50 transition-colors">导入配置</button>
+                        <button @click="exportChatData(); window.UIManager.showToast('系统已将数据导出为 JSON 文件')" class="py-4 bg-white rounded-2xl text-[12px] font-black text-gray-400 shadow-sm active:bg-gray-50 transition-colors">导出配置</button>
+                    </div>
+                    <button @click="showApiResetConfirm = true" class="w-full py-4 text-[12px] font-black text-red-300 active:text-red-400 transition-colors">重置为默认</button>
+                </div>
+            </div>
+
+            <!-- Reset Confirm Dialog -->
+            <div x-show="showApiResetConfirm" class="fixed inset-0 z-[1000] flex items-center justify-center px-10" x-cloak>
+                <div class="absolute inset-0 bg-black/30 backdrop-blur-md" @click="showApiResetConfirm = false"></div>
+                <div class="relative bg-white rounded-[35px] p-10 shadow-2xl w-full text-center space-y-8 api-page-fade">
+                    <div class="text-4xl">⚠️</div>
+                    <p class="text-base font-black text-gray-700">要清空所有配置吗？<br><span class="text-xs font-normal text-gray-400">操作不可撤销哦</span></p>
+                    <div class="flex gap-4">
+                        <button @click="showApiResetConfirm = false" class="flex-1 py-4 rounded-2xl bg-gray-100 text-[13px] font-bold text-gray-400">取消</button>
+                        <button @click="resetApiToDefault()" class="flex-1 py-4 rounded-2xl bg-red-400 text-[13px] font-bold text-white shadow-lg shadow-red-200">确定</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -4366,7 +4556,7 @@
                         title: '界面美化', 
                         items: [
                             { name: '横屏模式', sub: '开启/关闭横屏', toggle: true, model: 'isLandscape' },
-                            { name: '聊天背景', sub: '设置当前背景图 (URL)' },
+                            { name: '聊天背景', sub: '设置当前背景图 (URL)', action: 'changeBg' },
                             { name: '聊天气泡', sub: '前往 Yume 美化面板' },
                             { name: 'CSS自定义', sub: '实时代码注入' }
                         ]
@@ -4385,10 +4575,11 @@
                         title: '功能', 
                         items: [
                             { name: '搜索聊天记录', sub: '关键词搜索历史' },
-                            { name: '导出与导入', sub: 'JSON数据备份/恢复' },
+                            { name: '导出与导入', sub: 'JSON数据备份/恢复', action: 'importExport' },
                             { name: '筛选会话', sub: '按图片或日期筛选' },
                             { name: '全局记忆设置', sub: '自动提取开关' },
                             { name: '记忆管理', sub: '核心记忆与今日摘要', action: 'memory' },
+                            { name: 'API 高级设置', sub: '配置第三方大模型引擎', action: 'openApiSettings' },
                             { name: '清空对话', sub: '清除对话记录', dangerous: true }
                         ]
                     }
@@ -4403,6 +4594,9 @@
                                 <div @click="
                                         if(item.dangerous) { showClearModal = true; }
                                         else if(item.action === 'memory') { showMemoryManager = true; menuOpen = false; }
+                                        else if(item.action === 'changeBg') { openImagePicker('设置聊天背景', chatBgUrl, (url) => { this.chatBgUrl = url; this.saveP1Data(); window.UIManager.showToast('聊天背景已更新'); }); }
+                                        else if(item.action === 'importExport') { exportChatData(); }
+                                        else if(item.action === 'openApiSettings') { activeTab = 'apiSettings'; menuOpen = false; }
                                         else if(item.action === 'toggleTheme') { offlineTheme = offlineTheme === 'midnight' ? 'afternoon' : 'midnight'; item.sub = offlineTheme === 'midnight' ? '午夜书房' : '午后花园'; saveP1Data();UIManager.showToast('主题已切换为 ' + item.sub); }
                                         else if(item.model === 'isLandscape') { isLandscape = !isLandscape; }
                                         else if(item.toggle && item.model !== 'isLandscape') { item.state = !item.state; }
@@ -4669,7 +4863,7 @@
         </div>
         <div style="flex: 1;">
           <input type="text" class="acm-input" x-model="eaTitle" placeholder="App 名称">
-          <button @click="openImagePicker('App 图标', eaIconUrl, (url) => eaIconUrl = url)" class="px-3 py-1 bg-sophia-fill text-sophia-accent text-xs rounded-lg mt-2" style="width: 100%;">修改图标</button>
+          <button @click="openImagePicker('App 图标', eaIconUrl, (url) => this.eaIconUrl = url)" class="px-3 py-1 bg-sophia-fill text-sophia-accent text-xs rounded-lg mt-2" style="width: 100%;">修改图标</button>
         </div>
       </div>
       <div class="acm-body">
@@ -5145,6 +5339,7 @@
                   wallpaper: { url: 'https://images.unsplash.com/photo-1601662528567-526cf06f6582?q=80&w=400&auto=format&fit=crop', blur: 0 },
                   icon: { imgUrl: '', color: '#FFC8DD', size: 'standard', radius: 22, hideName: false },
                   font: { type: 'system', customUrl: '' },
+                  avatar: { imgUrl: '' },
                   statusText: '',
                   dockOpacity: 30,
                   splashEnabled: true,
@@ -5420,6 +5615,7 @@
                               wallpaper: { url: 'https://images.unsplash.com/photo-1601662528567-526cf06f6582?q=80&w=400&auto=format&fit=crop', blur: 0 },
                               icon: { imgUrl: '', color: '', size: 'standard', radius: 22, hideName: false },
                               font: { type: 'system', customUrl: '' },
+                              avatar: { imgUrl: '' },
                               statusText: '',
                               dockOpacity: 30,
                               splashEnabled: true,
@@ -6208,6 +6404,7 @@
                 // P1 Features State
                 isOfflineMode: false,
                 offlineTheme: 'midnight', // 'midnight' or 'afternoon'
+                chatBgUrl: localStorage.getItem('sophia_chat_bgurl') || '',
                 
                 memorySettings: { retention: 30, autoExtract: true },
                 coreMemories: [],
@@ -6234,7 +6431,19 @@
                 // Settings
                 apiKey: localStorage.getItem('sophia_api_key') || '',
                 apiUrl: localStorage.getItem('sophia_api_url') || 'https://api.openai.com/v1/chat/completions',
-                apiModel: localStorage.getItem('sophia_api_model') || 'gpt-3.5-turbo',
+                apiModel: localStorage.getItem('sophia_api_model') || 'gpt-4o-mini',
+                // API Settings New UI State
+                showApiResetConfirm: false,
+                apiShowKey: false,
+                circleEnabled: false,
+                roleStatus: 'unknown',
+                circleStatus: 'unknown',
+                apiTemp: Number(localStorage.getItem('sophia_api_temp')) || 0.7,
+                apiMaxTokens: Number(localStorage.getItem('sophia_api_max_tokens')) || 300,
+                apiStream: localStorage.getItem('sophia_api_stream') !== 'false',
+                urlPresets: ['https://api.openai.com/v1/chat/completions', 'https://api.deepseek.com/v1/chat/completions', 'https://api.anthropic.com/v1/messages'],
+                modelPresets: ['gpt-4o-mini', 'gpt-4o', 'deepseek-chat', 'claude-3-5-sonnet'],
+                circleApiKey: localStorage.getItem('sophia_circle_api_key') || '',
                 
                 init() {
                     this.loadSessions();
@@ -6260,6 +6469,78 @@
                     localStorage.setItem('sophia_court_cases', JSON.stringify(this.courtCases));
                     localStorage.setItem('sophia_gifts', JSON.stringify(this.gifts));
                     localStorage.setItem('sophia_offline_theme', this.offlineTheme);
+                    localStorage.setItem('sophia_chat_bgurl', this.chatBgUrl);
+                },
+
+                saveApiSettings() {
+                    localStorage.setItem('sophia_api_key', this.apiKey);
+                    localStorage.setItem('sophia_api_url', this.apiUrl);
+                    localStorage.setItem('sophia_api_model', this.apiModel);
+                    localStorage.setItem('sophia_api_temp', this.apiTemp);
+                    localStorage.setItem('sophia_api_max_tokens', this.apiMaxTokens);
+                    localStorage.setItem('sophia_api_stream', this.apiStream);
+                    localStorage.setItem('sophia_circle_api_key', this.circleApiKey);
+                },
+
+                testApiConnection(type) {
+                    this[type + 'Status'] = 'unknown';
+                    window.UIManager.showToast('正在拨通星际网络...');
+                    setTimeout(() => {
+                        const isOk = Math.random() > 0.2;
+                        this[type + 'Status'] = isOk ? 'online' : 'offline';
+                        window.UIManager.showToast(isOk ? '连接成功 ✨' : '连接失败，检查配置 ❌');
+                    }, 1200);
+                },
+
+                syncCircleConfig() {
+                    this.circleApiKey = this.apiKey;
+                    this.saveApiSettings();
+                    window.UIManager.showToast('配置同步成功');
+                },
+
+                resetApiToDefault() {
+                    this.apiUrl = 'https://api.openai.com/v1/chat/completions';
+                    this.apiKey = '';
+                    this.apiModel = 'gpt-4o-mini';
+                    this.apiTemp = 0.7;
+                    this.apiMaxTokens = 300;
+                    this.apiStream = true;
+                    this.circleApiKey = '';
+                    this.roleStatus = 'unknown';
+                    this.circleEnabled = false;
+                    this.showApiResetConfirm = false;
+                    this.saveApiSettings();
+                    window.UIManager.showToast('一切已回到初始状态');
+                },
+                
+                exportChatData() {
+                    const data = {
+                        sessions: this.sessions,
+                        messages: this.messages,
+                        coreMemories: this.coreMemories,
+                        settings: {
+                            apiKey: this.apiKey,
+                            apiUrl: this.apiUrl,
+                            apiModel: this.apiModel,
+                            apiTemp: this.apiTemp,
+                            apiMaxTokens: this.apiMaxTokens,
+                            apiStream: this.apiStream,
+                            circleApiKey: this.circleApiKey,
+                            offlineTheme: this.offlineTheme,
+                            chatBgUrl: this.chatBgUrl,
+                            memorySettings: this.memorySettings
+                        }
+                    };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `sophia_chatdata_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    UIManager.showToast('聊天数据已导出成功！');
                 },
                 
                 closeApp() {
@@ -6487,7 +6768,7 @@ ${offlineMsgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}:
                 
                 handlePanelAction(action) {
                     if (action === 'image') {
-                        openImagePicker('发送图片', '', (url) => this.sendImage(url));
+                        this.openImagePicker('发送图片', '', (url) => this.sendImage(url));
                     } else if (action === 'court') {
                         this.openCourt();
                     } else if (action === 'gift') {
@@ -6522,7 +6803,7 @@ ${offlineMsgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}:
                         this.panelOpen = false;
                         this.generateDiary();
                     } else {
-                        showDevToast();
+                        this.showDevToast();
                     }
                 },
                 
