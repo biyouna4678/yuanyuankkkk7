@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <script defer src="https://unpkg.com/@alpinejs/collapse@3.14.3/dist/cdn.min.js" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="lib/tailwindcss.js"></script>
+  <script defer src="lib/alpine-collapse.min.js"></script>
+  <script defer src="lib/alpine.min.js"></script>
+  <!-- Optional: Add localForage if needed globally -->
+  <script src="lib/localforage.min.js"></script>
   <script>
       tailwind.config = {
           theme: {
@@ -33,6 +35,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>iOS Style Home Screen</title>
     <style>
+        [x-cloak] { display: none !important; }
         /* --- CSS Variables --- */
         :root {
           --blur: 30px;
@@ -2476,6 +2479,18 @@
         .api-page-fade { animation: api-fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
         @keyframes api-fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+<script src="/src/lib/storage.js"></script>
+<script src="/src/apps/eics.js"></script>
+    <script src="/src/widgets/creamcat.js"></script>
+    <script src="/src/widgets/notebook.js"></script>
+    <script src="/src/widgets/rongrong.js"></script>
+    <script src="/src/widgets/vinylplayer.js"></script>
+    <script src="/src/widgets/listentogether.js"></script>
+    <script src="/src/apps/settings.js"></script>
+    <script src="/src/apps/memory.js"></script>
+    <script src="/src/apps/messageActions.js"></script>
+    <script src="/src/apps/court.js"></script>
+    <script src="/src/apps/chat.js"></script>
 </head>
 <body x-data="iosDesktop()">
 
@@ -3125,7 +3140,7 @@
     </div>
 
     <!-- 小组件设置模态框 -->
-    <div class="nm-container" x-show="editingWidget" style="display: none;" x-transition.opacity>
+    <div class="nm-container" x-show="editingWidget" x-cloak x-transition.opacity>
       <div class="nm-nav">
         <div class="nm-nav-back" @click="closeWidgetSettings()">‹ 返回</div>
         <div class="nm-nav-title">组件设置</div>
@@ -3952,7 +3967,7 @@
     </div>
 
     <!-- Chat App Overlay -->
-    <div x-show="activeApp === 'chat'" class="absolute inset-0 z-[100] bg-sophia-bg flex flex-col" x-data="chatApp()" @init-chat.window="init()" style="display: none;" x-transition>
+    <div x-show="activeApp === 'chat'" class="absolute inset-0 z-[100] bg-sophia-bg flex flex-col" x-cloak x-data="chatApp()" @init-chat.window="init()" @click.stop x-transition>
         
         <!-- List Tab -->
         <div x-show="activeTab === 'list'" class="h-full flex flex-col relative bg-[#fdf2f7] overflow-hidden">
@@ -3963,7 +3978,7 @@
                     <svg width="16" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
                 </div>
                 <!-- Remove activeTab='create' button to send-btn place, maintaining app functionality -->
-                <div @click="activeTab = 'create'" class="absolute right-4 top-10 text-sm text-gray-400 cursor-pointer">
+                <div @click="switchTab('create')" class="absolute right-4 top-10 text-sm text-gray-400 cursor-pointer" role="button" tabindex="0">
                     Send
                 </div>
             </div>
@@ -4050,7 +4065,7 @@
                 <div @click="showDevToast()" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 </div>
-                <div @click="activeTab = 'settings'" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
+                <div @click="switchTab('settings')" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </div>
             </nav>
@@ -4069,7 +4084,7 @@
 
             <header class="chat-header bg-[#fdf2f7]/90 backdrop-blur-md px-4 py-3 flex justify-between items-center border-b border-black/5 shrink-0 relative z-20">
                 <div class="flex items-center gap-2.5">
-                    <button @click="activeTab = 'list'" class="text-gray-600">
+                    <button @click="switchTab('list')" class="text-gray-600">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
                     <div>
@@ -4133,9 +4148,9 @@
                                                             
                                                             <template x-if="!eicsItem.actionTaken">
                                                                 <div class="flex gap-2 w-full">
-                                                                    <button @click="acceptGift(msg, eIdx)" class="flex-1 bg-sophia-accent text-white text-[10px] py-1.5 rounded-lg font-bold">收下</button>
-                                                                    <button @click="rejectGift(msg, eIdx)" class="flex-1 bg-gray-100 text-gray-500 text-[10px] py-1.5 rounded-lg font-bold">婉拒</button>
-                                                                </div>
+        <button @click="acceptGift(msg, eIdx)" class="flex-1 bg-sophia-accent text-white text-[10px] py-1.5 rounded-lg font-bold">收下</button>
+        <button @click="rejectGift(msg, eIdx)" class="flex-1 bg-gray-100 text-gray-500 text-[10px] py-1.5 rounded-lg font-bold">婉拒</button>
+    </div>
                                                             </template>
                                                             <template x-if="eicsItem.actionTaken === 'accepted'">
                                                                 <div class="text-[10px] text-sophia-accent font-bold bg-white px-3 py-1 rounded-full shadow-sm">已收下放入礼物墙</div>
@@ -4200,7 +4215,7 @@
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-5"
                  class="absolute bottom-[90px] left-0 right-0 bg-[#fdf2f7]/85 backdrop-blur-xl border-t border-white/50 px-4 py-5 rounded-t-3xl z-50 grid grid-cols-5 gap-y-4 gap-x-2 shadow-[0_4px_20px_rgba(255,133,178,0.15)]"
-                 style="display: none;">
+                 x-cloak>
                 
                 <div class="flex flex-col items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-transform" @click="handlePanelAction('image')">
                     <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-white/60 text-gray-500">
@@ -4296,7 +4311,7 @@
         <!-- Create Role Tab -->
         <div x-show="activeTab === 'create'" class="h-full flex flex-col relative bg-sophia-bg">
             <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex justify-between items-center border-b border-sophia-border/30">
-                <button @click="activeTab = 'list'" class="text-sophia-accent text-2xl font-light">‹</button>
+                <button @click="switchTab('list')" class="text-sophia-accent text-2xl font-light">‹</button>
                 <h1 class="text-lg font-semibold text-gray-800 tracking-tight">新建角色</h1>
                 <div class="w-6"></div>
             </header>
@@ -4341,12 +4356,49 @@
         <!-- Settings Tab -->
         <div x-show="activeTab === 'settings'" class="h-full flex flex-col relative bg-sophia-bg">
             <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex justify-between items-center border-b border-sophia-border/30">
-                <button @click="activeTab = 'list'" class="text-sophia-accent text-2xl font-light">‹</button>
+                <button @click="switchTab('list')" class="text-sophia-accent text-2xl font-light">‹</button>
                 <h1 class="text-lg font-semibold text-gray-800 tracking-tight">我的</h1>
                 <div class="w-6"></div>
             </header>
             
             <div class="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+                
+                <!-- Profile Entry -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex justify-between items-center cursor-pointer" @click="showProfileEdit = true">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-sophia-fill rounded-xl flex items-center justify-center text-xl">👤</div>
+                        <div>
+                            <div class="font-bold text-gray-800 text-sm">个人资料</div>
+                            <div class="text-[10px] text-gray-400">编辑头像和个性签名</div>
+                        </div>
+                    </div>
+                    <div class="text-gray-300">›</div>
+                </div>
+
+                <!-- Wallet Entry -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex justify-between items-center cursor-pointer" @click="showWallet = true">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-sophia-fill rounded-xl flex items-center justify-center text-xl">💎</div>
+                        <div>
+                            <div class="font-bold text-gray-800 text-sm">我的钱包</div>
+                            <div class="text-[10px] text-gray-400">查看银核与交易记录</div>
+                        </div>
+                    </div>
+                    <div class="text-gray-300">›</div>
+                </div>
+
+                <!-- Favorites Entry -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex justify-between items-center cursor-pointer" @click="showFavorites = true">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-sophia-fill rounded-xl flex items-center justify-center text-xl">⭐</div>
+                        <div>
+                            <div class="font-bold text-gray-800 text-sm">收藏夹</div>
+                            <div class="text-[10px] text-gray-400">查看收藏的对话与卡片</div>
+                        </div>
+                    </div>
+                    <div class="text-gray-300">›</div>
+                </div>
+
                 <!-- Gift Wall Entry -->
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex justify-between items-center cursor-pointer" @click="showGiftWall = true">
                     <div class="flex items-center gap-3">
@@ -4374,7 +4426,7 @@
                 <!-- API Settings Entry -->
                 <div class="space-y-4 pt-4">
                     <h3 class="text-[11px] text-sophia-title font-bold mb-3 tracking-[0.15em] uppercase">深入设置</h3>
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex justify-between items-center cursor-pointer" @click="activeTab = 'apiSettings'">
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex justify-between items-center cursor-pointer" @click="showApiSettings = true">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-sophia-fill rounded-xl flex items-center justify-center text-xl">⚙️</div>
                             <div>
@@ -4388,10 +4440,112 @@
             </div>
         </div>
 
-        <!-- API Settings Full Tab -->
-        <div x-show="activeTab === 'apiSettings'" style="display:none;" class="h-full flex flex-col relative bg-[#f4f4f4]">
+        
+        <!-- Profile Overaly -->
+        <div x-show="showProfileEdit" x-transition.opacity.duration.300ms x-cloak class="absolute inset-0 z-[500] flex flex-col bg-[#f4f4f4]">
             <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex items-center gap-4 border-b border-sophia-border/10 bg-white/85 backdrop-blur-[20px]">
-                <button @click="activeTab = 'settings'" class="active:scale-90 transition-transform">
+                <button type="button" @click="showProfileEdit = false" class="active:scale-90 transition-transform">
+                    <svg class="w-6 h-6 stroke-pink-300" fill="none" viewBox="0 0 24 24" stroke-width="3"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <h3 class="font-black text-gray-700 text-lg">个人资料</h3>
+            </header>
+            <div class="flex-1 api-scroll-container p-5 space-y-6 pb-28 no-scrollbar">
+                <section class="api-creamy-card space-y-6 api-page-fade">
+                    <div class="flex flex-col items-center gap-4 py-4">
+                        <div class="w-24 h-24 rounded-full shadow-[0_2px_10px_rgba(255,133,178,0.2)] border-[3px] border-white bg-cover bg-center cursor-pointer relative" 
+                             :style="userProfile.avatar ? `background-image: url(${$store.imageStore.get(userProfile.avatar)})` : 'background-color: white'"
+                             @click="triggerAvatarUpload()">
+                             <div class="absolute inset-0 bg-black/20 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                <span class="text-white text-2xl">📷</span>
+                             </div>
+                        </div>
+                        <p class="text-xs text-gray-400">点击更换头像</p>
+                    </div>
+                    
+                    <div>
+                        <label class="api-label">昵称</label>
+                        <div class="api-input-group">
+                            <input type="text" x-model="userProfile.name" @change="saveUserProfile()" placeholder="你的名字">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="api-label">个性签名</label>
+                        <div class="api-input-group">
+                            <input type="text" x-model="userProfile.motto" @change="saveUserProfile()" placeholder="随便写点什么...">
+                        </div>
+                    </div>
+                    
+                    <button class="w-full bg-sophia-accent text-white font-bold py-3 mt-4 rounded-xl shadow-soft" @click="showProfileEdit = false">确认修改</button>
+                </section>
+            </div>
+        </div>
+
+        <!-- Wallet Overlay -->
+        <div x-show="showWallet" x-transition.opacity.duration.300ms x-cloak class="absolute inset-0 z-[500] flex flex-col bg-[#f4f4f4]">
+            <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex items-center gap-4 border-b border-sophia-border/10 bg-white/85 backdrop-blur-[20px]">
+                <button type="button" @click="showWallet = false" class="active:scale-90 transition-transform">
+                    <svg class="w-6 h-6 stroke-pink-300" fill="none" viewBox="0 0 24 24" stroke-width="3"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <h3 class="font-black text-gray-700 text-lg">我的钱包</h3>
+            </header>
+            <div class="flex-1 api-scroll-container p-5 space-y-6 pb-28 no-scrollbar">
+                <!-- Balance Card -->
+                <div class="bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-3xl p-6 shadow-xl shadow-pink-200">
+                    <div class="text-sm font-medium mb-1 opacity-90">当前余额 (银核)</div>
+                    <div class="text-4xl font-black" x-text="userWallet.coins"></div>
+                    <div class="mt-4 flex gap-3">
+                        <button class="bg-white/20 hover:bg-white/30 backdrop-blur-md px-4 py-2 rounded-xl text-xs font-bold transition-colors" @click="earnCoins(100, '签到奖励')">签到领取</button>
+                        <button class="bg-white/20 hover:bg-white/30 backdrop-blur-md px-4 py-2 rounded-xl text-xs font-bold transition-colors">充值</button>
+                    </div>
+                </div>
+                
+                <!-- Transactions -->
+                <h4 class="text-[11px] text-sophia-title font-bold tracking-[0.15em] uppercase px-1 pt-2">交易明细</h4>
+                <div class="space-y-3">
+                    <template x-for="item in userWallet.transactions" :key="item.id">
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-gray-800 text-xs" x-text="item.title"></div>
+                                <div class="text-[9px] text-gray-400 mt-0.5" x-text="item.date"></div>
+                            </div>
+                            <div class="font-bold" :class="item.amount.startsWith('+') ? 'text-green-500' : 'text-gray-700'" x-text="item.amount"></div>
+                        </div>
+                    </template>
+                    <div x-show="userWallet.transactions.length === 0" class="text-center text-xs text-gray-400 py-10">暂无交易记录</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites Overlay -->
+        <div x-show="showFavorites" x-transition.opacity.duration.300ms x-cloak class="absolute inset-0 z-[500] flex flex-col bg-[#f4f4f4]">
+            <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex items-center gap-4 border-b border-sophia-border/10 bg-white/85 backdrop-blur-[20px]">
+                <button type="button" @click="showFavorites = false" class="active:scale-90 transition-transform">
+                    <svg class="w-6 h-6 stroke-pink-300" fill="none" viewBox="0 0 24 24" stroke-width="3"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <h3 class="font-black text-gray-700 text-lg">我的收藏</h3>
+            </header>
+            <div class="flex-1 api-scroll-container p-5 space-y-4 pb-28 no-scrollbar">
+                <template x-for="fav in userFavorites" :key="fav.id">
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-sophia-border/20 flex flex-col gap-2 relative">
+                        <button class="absolute top-3 right-3 text-red-300 hover:text-red-400" @click="removeFavorite(fav.id)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        </button>
+                        <div class="text-[10px] text-gray-400" x-text="new Date(fav.savedAt).toLocaleDateString()"></div>
+                        <div class="text-sm text-gray-800 leading-relaxed" x-text="fav.content"></div>
+                        <div x-show="fav.type === 'message' && fav.roleName" class="text-[10px] font-bold text-sophia-accent mt-1" x-text="'来自: ' + fav.roleName"></div>
+                    </div>
+                </template>
+                <div x-show="userFavorites.length === 0" class="flex flex-col items-center justify-center pt-20 text-gray-400 gap-2">
+                    <span class="text-4xl opacity-50">💔</span>
+                    <p class="text-xs font-medium">暂时没有收藏的内容哦</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Settings Full Overlay -->
+        <div x-show="showApiSettings" x-transition.opacity.duration.300ms x-cloak class="absolute inset-0 z-[500] flex flex-col bg-[#f4f4f4]">
+            <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex items-center gap-4 border-b border-sophia-border/10 bg-white/85 backdrop-blur-[20px]">
+                <button type="button" @click="showApiSettings = false" class="active:scale-90 transition-transform">
                     <svg class="w-6 h-6 stroke-pink-300" fill="none" viewBox="0 0 24 24" stroke-width="3"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
                 <h3 class="font-black text-gray-700 text-lg">API 设置</h3>
@@ -4407,7 +4561,7 @@
                     </div>
 
                     <div>
-                        <label class="api-label">API Endpoint</label>
+                        <label class="api-label">API 请求地址</label>
                         <div class="api-input-group">
                             <input type="text" x-model="apiUrl" @change="saveApiSettings()" placeholder="https://api.openai.com/v1/chat/completions">
                             <select class="!w-auto text-pink-300 font-bold ml-2 cursor-pointer" @change="apiUrl = $event.target.value; $event.target.value = ''; saveApiSettings()">
@@ -4418,10 +4572,10 @@
                     </div>
 
                     <div>
-                        <label class="api-label">Secret API Key</label>
+                        <label class="api-label">API 密钥 (Secret Key)</label>
                         <div class="api-input-group">
                             <input :type="apiShowKey ? 'text' : 'password'" x-model="apiKey" @change="saveApiSettings()" placeholder="sk-xxxxxx...">
-                            <button @click="apiShowKey = !apiShowKey" class="ml-2 text-pink-200 active:scale-90 transition-transform">
+                            <button type="button" @click="apiShowKey = !apiShowKey" class="ml-2 text-pink-200 active:scale-90 transition-transform">
                                 <svg x-show="!apiShowKey" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 <svg x-show="apiShowKey" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
                             </button>
@@ -4429,7 +4583,7 @@
                     </div>
 
                     <div>
-                        <label class="api-label">Model Name</label>
+                        <label class="api-label">模型名称 (Model Name)</label>
                         <div class="api-input-group">
                             <input type="text" x-model="apiModel" @change="saveApiSettings()" placeholder="gpt-4o-mini">
                             <select class="!w-auto text-pink-300 font-bold ml-2 cursor-pointer" @change="apiModel = $event.target.value; $event.target.value = ''; saveApiSettings()">
@@ -4441,24 +4595,24 @@
 
                     <div class="space-y-6 pt-2">
                         <div>
-                            <div class="flex justify-between items-center mb-3"><label class="api-label !mb-0">Temperature</label><span class="text-xs font-mono font-bold text-pink-300 bg-pink-50 px-2 py-0.5 rounded-lg" x-text="apiTemp"></span></div>
+                            <div class="flex justify-between items-center mb-3"><label class="api-label !mb-0">发散度 (Temperature)</label><span class="text-xs font-mono font-bold text-pink-300 bg-pink-50 px-2 py-0.5 rounded-lg" x-text="apiTemp"></span></div>
                             <input type="range" min="0" max="2" step="0.1" x-model.number="apiTemp" @change="saveApiSettings()" class="api-range">
                         </div>
                         <div>
-                            <div class="flex justify-between items-center mb-3"><label class="api-label !mb-0">Max Tokens</label><span class="text-xs font-mono font-bold text-pink-300 bg-pink-50 px-2 py-0.5 rounded-lg" x-text="apiMaxTokens"></span></div>
+                            <div class="flex justify-between items-center mb-3"><label class="api-label !mb-0">最大回复长度 (Max Tokens)</label><span class="text-xs font-mono font-bold text-pink-300 bg-pink-50 px-2 py-0.5 rounded-lg" x-text="apiMaxTokens"></span></div>
                             <input type="range" min="100" max="2000" step="50" x-model.number="apiMaxTokens" @change="saveApiSettings()" class="api-range">
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-2">
-                        <label class="api-label !mb-0">Stream Response</label>
+                        <label class="api-label !mb-0">流式响应 (Stream)</label>
                         <div @click="apiStream = !apiStream; saveApiSettings()">
                             <input type="checkbox" class="hidden api-toggle-checkbox" :checked="apiStream">
                             <label class="api-toggle-label"></label>
                         </div>
                     </div>
 
-                    <button @click="testApiConnection('role')" class="api-btn-secondary active:scale-[0.98]">测试连接</button>
+                    <button type="button" @click="testApiConnection('role')" class="api-btn-secondary active:scale-[0.98]">测试连接</button>
                 </section>
 
                 <section class="api-creamy-card space-y-6">
@@ -4473,18 +4627,18 @@
 
                     <div x-show="circleEnabled" x-collapse x-cloak class="space-y-5 pt-2">
                         <div class="api-input-group">
-                            <input :type="apiShowKey ? 'text' : 'password'" placeholder="Enter API Key" x-model="circleApiKey" @change="saveApiSettings()">
+                            <input :type="apiShowKey ? 'text' : 'password'" placeholder="输入 API 密钥" x-model="circleApiKey" @change="saveApiSettings()">
                         </div>
                         <div class="flex justify-between items-center pt-2">
-                            <button @click="syncCircleConfig()" class="text-xs font-bold text-pink-200 underline active:opacity-50 transition-opacity">复用角色配置</button>
-                            <button @click="testApiConnection('circle')" class="api-btn-secondary !w-auto px-8">测试连接</button>
+                            <button type="button" @click="syncCircleConfig()" class="text-xs font-bold text-pink-200 underline active:opacity-50 transition-opacity">复用角色配置</button>
+                            <button type="button" @click="testApiConnection('circle')" class="api-btn-secondary !w-auto px-8">测试连接</button>
                         </div>
                     </div>
                 </section>
 
                 <div class="px-2 space-y-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <button @click="window.UIManager.showToast('该功能即将开放导入')" class="py-4 bg-white rounded-2xl text-[12px] font-black text-gray-400 shadow-sm active:bg-gray-50 transition-colors">导入配置</button>
+                        <button @click="importApiSettings()" class="py-4 bg-white rounded-2xl text-[12px] font-black text-gray-400 shadow-sm active:bg-gray-50 transition-colors">导入配置</button>
                         <button @click="exportChatData(); window.UIManager.showToast('系统已将数据导出为 JSON 文件')" class="py-4 bg-white rounded-2xl text-[12px] font-black text-gray-400 shadow-sm active:bg-gray-50 transition-colors">导出配置</button>
                     </div>
                     <button @click="showApiResetConfirm = true" class="w-full py-4 text-[12px] font-black text-red-300 active:text-red-400 transition-colors">重置为默认</button>
@@ -4498,8 +4652,8 @@
                     <div class="text-4xl">⚠️</div>
                     <p class="text-base font-black text-gray-700">要清空所有配置吗？<br><span class="text-xs font-normal text-gray-400">操作不可撤销哦</span></p>
                     <div class="flex gap-4">
-                        <button @click="showApiResetConfirm = false" class="flex-1 py-4 rounded-2xl bg-gray-100 text-[13px] font-bold text-gray-400">取消</button>
-                        <button @click="resetApiToDefault()" class="flex-1 py-4 rounded-2xl bg-red-400 text-[13px] font-bold text-white shadow-lg shadow-red-200">确定</button>
+                        <button type="button" @click="showApiResetConfirm = false" class="flex-1 py-4 rounded-2xl bg-gray-100 text-[13px] font-bold text-gray-400">取消</button>
+                        <button type="button" @click="resetApiToDefault()" class="flex-1 py-4 rounded-2xl bg-red-400 text-[13px] font-bold text-white shadow-lg shadow-red-200">确定</button>
                     </div>
                 </div>
             </div>
@@ -4508,12 +4662,12 @@
         <!-- Top Right Menu -->
         <div x-show="menuOpen" 
              class="absolute inset-0 z-40 bg-black/20" 
-             style="display: none;"
+             x-cloak
              x-transition:opacity
              @click="menuOpen = false"></div>
 
         <nav x-show="menuOpen"
-             style="display: none;"
+             x-cloak
              x-transition:enter="transition transform duration-300 ease-out"
              x-transition:enter-start="translate-x-full"
              x-transition:enter-end="translate-x-0"
@@ -4536,8 +4690,8 @@
                     <div class="text-[#ff85b2] opacity-80 text-xl animate-pulse">❤</div>
                     
                     <div class="flex flex-col items-center gap-2">
-                        <div class="w-16 h-16 rounded-full bg-white shadow-[0_2px_10px_rgba(255,133,178,0.2)] border-[3px] border-white bg-cover bg-center" :style="dressUp.avatar.imgUrl ? `background-image: url(${$store.imageStore.get(dressUp.avatar.imgUrl)})` : ''"></div>
-                        <span class="text-[11px] font-bold text-gray-700">You</span>
+                        <div class="w-16 h-16 rounded-full bg-white shadow-[0_2px_10px_rgba(255,133,178,0.2)] border-[3px] border-white bg-cover bg-center" :style="(userProfile && userProfile.avatar) ? `background-image: url(${$store.imageStore.get(userProfile.avatar)})` : (dressUp.avatar.imgUrl ? `background-image: url(${$store.imageStore.get(dressUp.avatar.imgUrl)})` : '')"></div>
+                        <span class="text-[11px] font-bold text-gray-700" x-text="(userProfile && userProfile.name) || 'You'"></span>
                     </div>
                 </div>
             </div>
@@ -4594,9 +4748,12 @@
                                 <div @click="
                                         if(item.dangerous) { showClearModal = true; }
                                         else if(item.action === 'memory') { showMemoryManager = true; menuOpen = false; }
-                                        else if(item.action === 'changeBg') { openImagePicker('设置聊天背景', chatBgUrl, (url) => { this.chatBgUrl = url; this.saveP1Data(); window.UIManager.showToast('聊天背景已更新'); }); }
-                                        else if(item.action === 'importExport') { exportChatData(); }
-                                        else if(item.action === 'openApiSettings') { activeTab = 'apiSettings'; menuOpen = false; }
+                                        else if(item.action === 'changeBg') { openImagePicker('设置聊天背景', chatBgUrl, (url) => { chatBgUrl = url; saveP1Data(); window.UIManager.showToast('聊天背景已更新'); }); }
+                                        else if(item.action === 'importExport') { 
+                                            showApiSettings = true;
+                                            menuOpen = false;
+                                        }
+                                        else if(item.action === 'openApiSettings') { showApiSettings = true; menuOpen = false; }
                                         else if(item.action === 'toggleTheme') { offlineTheme = offlineTheme === 'midnight' ? 'afternoon' : 'midnight'; item.sub = offlineTheme === 'midnight' ? '午夜书房' : '午后花园'; saveP1Data();UIManager.showToast('主题已切换为 ' + item.sub); }
                                         else if(item.model === 'isLandscape') { isLandscape = !isLandscape; }
                                         else if(item.toggle && item.model !== 'isLandscape') { item.state = !item.state; }
@@ -4632,7 +4789,7 @@
         </nav>
         
         <!-- Clear Chat Modal -->
-        <div x-show="showClearModal" class="absolute inset-0 z-[60] flex items-center justify-center px-10" style="display: none;">
+        <div x-show="showClearModal" class="absolute inset-0 z-[60] flex items-center justify-center px-10" x-cloak>
             <div x-show="showClearModal" x-transition:opacity @click="showClearModal = false" class="absolute inset-0 bg-[#ff85b2]/20 backdrop-blur-sm shadow-xl"></div>
             <div x-show="showClearModal" x-transition:enter="transition scale-90 opacity-0 duration-200" x-transition:enter-end="scale-100 opacity-100" x-transition:leave="transition scale-90 opacity-0 duration-200"
                  class="relative bg-white/95 rounded-[30px] w-full max-w-sm shadow-2xl text-center p-8 border border-white">
@@ -4649,7 +4806,7 @@
         </div>
 
         <!-- Memory Manager Modal -->
-        <div x-show="showMemoryManager" class="absolute inset-0 z-[120] bg-sophia-bg flex flex-col" style="display: none;" x-transition>
+        <div x-show="showMemoryManager" class="absolute inset-0 z-[120] bg-sophia-bg flex flex-col" x-cloak x-transition>
             <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex justify-between items-center border-b border-sophia-border/30">
                 <button @click="showMemoryManager = false" class="text-sophia-accent text-2xl font-light">‹</button>
                 <h1 class="text-lg font-semibold text-gray-800 tracking-tight">记忆管理</h1>
@@ -4661,11 +4818,11 @@
                     <h3 class="text-sm font-bold text-gray-800 mb-4">记忆设置</h3>
                     <div class="flex items-center justify-between mb-4">
                         <span class="text-sm text-gray-600">自动提取记忆</span>
-                        <input type="checkbox" x-model="memorySettings.autoExtract" @change="saveP1Data()" class="toggle-checkbox">
+                        <input type="checkbox" x-model="memorySettings.autoExtract" @change="saveMemorySettings()" class="toggle-checkbox">
                     </div>
                     <div class="flex items-center justify-between mb-4">
                         <span class="text-sm text-gray-600">记忆保留时间</span>
-                        <select x-model="memorySettings.retention" @change="saveP1Data()" class="text-sm bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none">
+                        <select x-model="memorySettings.retention" @change="saveMemorySettings()" class="text-sm bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none">
                             <option value="3">3天</option>
                             <option value="7">7天</option>
                             <option value="15">15天</option>
@@ -4716,7 +4873,7 @@
         </div>
 
         <!-- Gift Wall Modal -->
-        <div x-show="showGiftWall" class="absolute inset-0 z-[120] bg-sophia-bg flex flex-col" style="display: none;" x-transition>
+        <div x-show="showGiftWall" class="absolute inset-0 z-[120] bg-sophia-bg flex flex-col" x-cloak x-transition>
             <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex justify-between items-center border-b border-sophia-border/30">
                 <button @click="showGiftWall = false" class="text-sophia-accent text-2xl font-light">‹</button>
                 <h1 class="text-lg font-semibold text-gray-800 tracking-tight">礼物墙</h1>
@@ -4741,7 +4898,7 @@
         </div>
 
         <!-- Diary Book Modal -->
-        <div x-show="showDiaryBook" class="absolute inset-0 z-[120] bg-sophia-bg flex flex-col" style="display: none;" x-transition>
+        <div x-show="showDiaryBook" class="absolute inset-0 z-[120] bg-sophia-bg flex flex-col" x-cloak x-transition>
             <header class="glass sticky top-0 z-10 px-6 pt-12 pb-4 flex justify-between items-center border-b border-sophia-border/30">
                 <button @click="showDiaryBook = false" class="text-sophia-accent text-2xl font-light">‹</button>
                 <h1 class="text-lg font-semibold text-gray-800 tracking-tight">日记本</h1>
@@ -4764,7 +4921,7 @@
         </div>
 
         <!-- Courtroom Modal -->
-        <div x-show="showCourt" class="absolute inset-0 z-[110] bg-black/40 flex items-center justify-center p-4" style="display: none;" x-transition.opacity>
+        <div x-show="showCourt" class="absolute inset-0 z-[110] bg-black/40 flex items-center justify-center p-4" x-cloak x-transition.opacity>
             <div class="bg-[#FDFAF6] w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[85vh]" @click.stop>
                 <!-- Header -->
                 <div class="bg-[#F4EFE6] p-5 flex flex-col items-center relative border-b border-[#E8E0D5]">
@@ -4856,7 +5013,7 @@
 
     <!-- App 设置上下文菜单 (Context Menu) -->
     <div class="dress-up-backdrop" :class="{ 'show': editingApp }" @click="closeAppEdit()" style="z-index: 10001;"></div>
-    <div class="app-context-menu" x-show="editingApp" style="display: none;" x-transition.opacity :style="`top: ${eaPosition.top}; left: ${eaPosition.left};`">
+    <div class="app-context-menu" x-show="editingApp" x-cloak x-transition.opacity :style="`top: ${eaPosition.top}; left: ${eaPosition.left};`">
       <div class="acm-header">
         <div class="app-icon" style="transform: scale(0.8); transform-origin: left center; margin-right: 10px;">
           <div class="icon-box squircle" :class="(eaIconUrl || dressUp.icon.imgUrl || dressUp.icon.color) ? '' : editingApp?.color" x-html="(eaIconUrl || dressUp.icon.imgUrl) ? '' : (editingApp ? SVGS[editingApp.icon] : '')" :style="(eaIconUrl || dressUp.icon.imgUrl) ? `background-image: url(${$store.imageStore.get(eaIconUrl || dressUp.icon.imgUrl)}), linear-gradient(145deg, #FFF0F3, #FFE4E8); background-color: transparent;` : (dressUp.icon.color ? `background: ${dressUp.icon.color};` : '')"></div>
@@ -4959,63 +5116,10 @@
         <button class="acm-btn save" @click="imagePickerModal.onConfirm && imagePickerModal.onConfirm(imagePickerModal.url); imagePickerModal.show = false">确定</button>
       </div>
     </div>
+    </div> <!-- end Chat App Overlay -->
 
     <script>
-        const STORAGE_CONSTANTS = {
-            DB_NAME: 'SophiaDataDB',
-            STORE_IMAGES: 'images',
-            MAX_IMAGES: 50
-        };
-
-        const ImageStorage = {
-            db: null,
-            async init() {
-                if (this.db) return this.db;
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(STORAGE_CONSTANTS.DB_NAME, 1);
-                    request.onupgradeneeded = (e) => {
-                        const db = e.target.result;
-                        if (!db.objectStoreNames.contains(STORAGE_CONSTANTS.STORE_IMAGES)) {
-                            db.createObjectStore(STORAGE_CONSTANTS.STORE_IMAGES, { keyPath: 'id' });
-                        }
-                    };
-                    request.onsuccess = (e) => { this.db = e.target.result; resolve(this.db); };
-                    request.onerror = (e) => reject(e.target.error);
-                });
-            },
-            async saveImage(file) {
-                await this.init();
-                const id = 'indexeddb://img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-                return new Promise((resolve, reject) => {
-                    const tx = this.db.transaction(STORAGE_CONSTANTS.STORE_IMAGES, 'readwrite');
-                    const store = tx.objectStore(STORAGE_CONSTANTS.STORE_IMAGES);
-                    const countReq = store.count();
-                    countReq.onsuccess = () => {
-                        if (countReq.result >= STORAGE_CONSTANTS.MAX_IMAGES) {
-                            reject(new Error('QUOTA_EXCEEDED'));
-                            return;
-                        }
-                        const putReq = store.put({ id, blob: file, timestamp: Date.now() });
-                        putReq.onsuccess = () => resolve(id);
-                        putReq.onerror = () => reject(putReq.error);
-                    };
-                });
-            },
-            async getImage(id) {
-                await this.init();
-                return new Promise((resolve, reject) => {
-                    const tx = this.db.transaction(STORAGE_CONSTANTS.STORE_IMAGES, 'readonly');
-                    const store = tx.objectStore(STORAGE_CONSTANTS.STORE_IMAGES);
-                    const req = store.get(id);
-                    req.onsuccess = () => {
-                        if (req.result) resolve(URL.createObjectURL(req.result.blob));
-                        else resolve(null);
-                    };
-                    req.onerror = () => reject(req.error);
-                });
-            }
-        };
-
+        
         const SVGS = {
           Calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
           Droplet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>',
@@ -5086,231 +5190,6 @@
               }
           });
 
-          Alpine.data('creamCatWidget', function(item) {
-            return {
-              currentTime: '',
-              timer: null,
-              init() {
-                this.updateTime();
-                this.timer = setInterval(() => this.updateTime(), 1000);
-              },
-              destroy() {
-                if (this.timer) clearInterval(this.timer);
-              },
-              updateTime() {
-                const now = new Date();
-                this.currentTime = now.toLocaleTimeString('zh-CN', { hour12: false });
-              },
-              get calendarDays() {
-                // 模拟一个静态的日历展示，带有高亮和猫爪
-                return [
-                  { text: '8', isHighlight: true }, { text: '9' }, { text: '10' }, { text: '11' }, { text: '12' }, { text: '13' }, { text: '14', isHighlight: true },
-                  { text: '15', isHighlight: true }, { text: '16' }, { text: '17' }, { text: '18' }, { text: '19' }, { text: '20' }, { text: '21', isHighlight: true },
-                  { text: '22', isHighlight: true }, { text: '23' }, { text: '24' }, { text: '25' }, { text: '26' }, { text: '27' }, { text: '🐾' },
-                  { text: '29', isHighlight: true }, { text: '30' }, { text: '31' }, { text: '1', isFaded: true }, { text: '2', isFaded: true }, { text: '3', isFaded: true }, { text: '4', isFaded: true }
-                ];
-              }
-            }
-          });
-          Alpine.data('notebookWidget', function() {
-            return {
-              get dates() {
-                const today = new Date();
-                const dates = [];
-                for (let i = 0; i < 7; i++) {
-                  const d = new Date(today);
-                  d.setDate(today.getDate() + i);
-                  dates.push({
-                    num: d.getDate(),
-                    isToday: i === 0
-                  });
-                }
-                return dates;
-              }
-            }
-          });
-          Alpine.data('rongRongWidget', function(initialItem) {
-            return {
-              item: initialItem,
-              get daysCount() {
-                if (!this.item || !this.item.startDate) return 324;
-                const start = new Date(this.item.startDate);
-                const now = new Date();
-                if (isNaN(start.getTime())) return 324;
-                start.setHours(0,0,0,0);
-                now.setHours(0,0,0,0);
-                const diffTime = Math.abs(now - start);
-                let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                if (this.item.includeToday) {
-                    diffDays += 1;
-                }
-                return diffDays;
-              }
-            }
-          });
-
-          Alpine.data('vinylPlayerWidget', function(item) {
-            return {
-              isPlaying: false,
-              audioSrc: '',
-              audioElement: null,
-              
-              init() {
-                this.audioElement = new Audio();
-                this.audioElement.addEventListener('ended', () => {
-                  this.isPlaying = false;
-                });
-              },
-              togglePlay() {
-                if (!this.audioSrc) {
-                  this.triggerUpload();
-                  return;
-                }
-                if (this.isPlaying) {
-                  this.audioElement.pause();
-                  this.isPlaying = false;
-                } else {
-                  this.audioElement.play();
-                  this.isPlaying = true;
-                }
-              },
-              triggerUpload() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'audio/mp3, audio/mpeg, audio/wav, audio/ogg, audio/m4a, .mp3, .wav, .m4a, .ogg';
-                input.onchange = (e) => this.handleFiles(e.target.files);
-                input.click();
-              },
-              handleFiles(files) {
-                if (!files || files.length === 0) return;
-                const file = files[0];
-                if (file) {
-                  const url = URL.createObjectURL(file);
-                  this.audioSrc = url;
-                  this.audioElement.src = url;
-                  this.audioElement.play();
-                  this.isPlaying = true;
-                }
-              }
-            }
-          });
-
-          Alpine.data('listenTogetherPlayer', function() {
-            return {
-              audio: null,
-              playlist: [],
-              currentIndex: 0,
-              isPlaying: false,
-              currentTime: 0,
-              duration: 0,
-              isUploading: false,
-              uploadProgress: 0,
-              
-              init() {
-                this.audio = new Audio();
-                this.audio.addEventListener('timeupdate', () => {
-                  this.currentTime = this.audio.currentTime;
-                });
-                this.audio.addEventListener('loadedmetadata', () => {
-                  this.duration = this.audio.duration;
-                });
-                this.audio.addEventListener('ended', () => {
-                  this.nextSong();
-                });
-              },
-              
-              formatTime(seconds) {
-                if (!seconds || isNaN(seconds)) return '0:00';
-                const m = Math.floor(seconds / 60);
-                const s = Math.floor(seconds % 60).toString().padStart(2, '0');
-                return `${m}:${s}`;
-              },
-              
-              togglePlay() {
-                if (this.playlist.length === 0) return;
-                if (this.isPlaying) {
-                  this.audio.pause();
-                  this.isPlaying = false;
-                } else {
-                  this.audio.play();
-                  this.isPlaying = true;
-                }
-              },
-              
-              nextSong() {
-                if (this.playlist.length === 0) return;
-                this.currentIndex = (this.currentIndex + 1) % this.playlist.length;
-                this.playCurrent();
-              },
-              
-              prevSong() {
-                if (this.playlist.length === 0) return;
-                this.currentIndex = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length;
-                this.playCurrent();
-              },
-              
-              playCurrent() {
-                if (this.playlist.length === 0) return;
-                this.audio.src = this.playlist[this.currentIndex].url;
-                this.audio.play();
-                this.isPlaying = true;
-              },
-              
-              triggerUpload() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'audio/mp3, audio/mpeg';
-                input.multiple = true;
-                input.onchange = (e) => this.handleFiles(e.target.files);
-                input.click();
-              },
-              
-              handleFiles(files) {
-                if (!files || files.length === 0) return;
-                
-                this.isUploading = true;
-                this.uploadProgress = 0;
-                
-                let progress = 0;
-                const interval = setInterval(() => {
-                  progress += 10;
-                  this.uploadProgress = progress;
-                  if (progress >= 100) {
-                    clearInterval(interval);
-                    this.processFiles(files);
-                  }
-                }, 50);
-              },
-              
-              processFiles(files) {
-                Array.from(files).forEach(file => {
-                  const url = URL.createObjectURL(file);
-                  let title = file.name.replace(/\.[^/.]+$/, "");
-                  let artist = "未知歌手";
-                  
-                  if (title.includes('-')) {
-                    const parts = title.split('-');
-                    artist = parts[0].trim();
-                    title = parts[1].trim();
-                  }
-                  
-                  this.playlist.push({
-                    title,
-                    artist,
-                    url
-                  });
-                });
-                
-                this.isUploading = false;
-                
-                if (this.playlist.length > 0 && !this.isPlaying) {
-                  this.currentIndex = this.playlist.length - files.length;
-                  this.playCurrent();
-                }
-              }
-            }
-          });
-
           Alpine.data('iosDesktop', function() {
             return {
               activeApp: null,
@@ -5362,7 +5241,7 @@
               },
               
               loadLayout() {
-                const saved = localStorage.getItem('ios20-layout-v4');
+                const saved = AppStorage.getItem('ios20-layout-v4');
                 if (saved) {
                   try {
                     const parsed = JSON.parse(saved);
@@ -5413,7 +5292,7 @@
               saveLayout() {
                 const getRaw = (arr) => arr.map(i => Alpine.raw(i));
                 try {
-                  localStorage.setItem('ios20-layout-v4', JSON.stringify({
+                  AppStorage.setItem('ios20-layout-v4', JSON.stringify({
                     items: getRaw(Alpine.raw(this.items)),
                     dockItems: getRaw(Alpine.raw(this.dockItems))
                   }));
@@ -5489,12 +5368,12 @@
                   // Save draft with debounce
                   if (this._draftSaveTimer) clearTimeout(this._draftSaveTimer);
                   this._draftSaveTimer = setTimeout(() => {
-                      localStorage.setItem('sophia_draft', JSON.stringify(Alpine.raw(this.dressUp)));
+                      AppStorage.setItem('sophia_draft', JSON.stringify(Alpine.raw(this.dressUp)));
                   }, 500);
               },
               
               loadDressUpFromStorage() {
-                  const savedSchemes = localStorage.getItem('sophia_schemes');
+                  const savedSchemes = AppStorage.getItem('sophia_schemes');
                   if (savedSchemes) {
                       try {
                           this.designSchemes = JSON.parse(savedSchemes);
@@ -5503,8 +5382,8 @@
                       }
                   }
                   
-                  const activeSchemeId = localStorage.getItem('sophia_active_scheme');
-                  const draft = localStorage.getItem('sophia_draft');
+                  const activeSchemeId = AppStorage.getItem('sophia_active_scheme');
+                  const draft = AppStorage.getItem('sophia_draft');
                   
                   if (draft) {
                       try {
@@ -5535,10 +5414,10 @@
               
               exportData() {
                   const data = {
-                      layout: localStorage.getItem('ios20-layout-v4'),
-                      schemes: localStorage.getItem('sophia_schemes'),
-                      activeScheme: localStorage.getItem('sophia_active_scheme'),
-                      draft: localStorage.getItem('sophia_draft')
+                      layout: AppStorage.getItem('ios20-layout-v4'),
+                      schemes: AppStorage.getItem('sophia_schemes'),
+                      activeScheme: AppStorage.getItem('sophia_active_scheme'),
+                      draft: AppStorage.getItem('sophia_draft')
                   };
                   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                   const url = URL.createObjectURL(blob);
@@ -5560,10 +5439,10 @@
                   reader.onload = (e) => {
                       try {
                           const data = JSON.parse(e.target.result);
-                          if (data.layout) localStorage.setItem('ios20-layout-v4', data.layout);
-                          if (data.schemes) localStorage.setItem('sophia_schemes', data.schemes);
-                          if (data.activeScheme) localStorage.setItem('sophia_active_scheme', data.activeScheme);
-                          if (data.draft) localStorage.setItem('sophia_draft', data.draft);
+                          if (data.layout) AppStorage.setItem('ios20-layout-v4', data.layout);
+                          if (data.schemes) AppStorage.setItem('sophia_schemes', data.schemes);
+                          if (data.activeScheme) AppStorage.setItem('sophia_active_scheme', data.activeScheme);
+                          if (data.draft) AppStorage.setItem('sophia_draft', data.draft);
                           
                           UIManager.showToast('配置已导入，即将刷新页面');
                           setTimeout(() => window.location.reload(), 1500);
@@ -5589,8 +5468,8 @@
                   
                   this.dressUp.activeScheme = id;
                   
-                  localStorage.setItem('sophia_schemes', JSON.stringify(Alpine.raw(this.designSchemes)));
-                  localStorage.setItem('sophia_active_scheme', id);
+                  AppStorage.setItem('sophia_schemes', JSON.stringify(Alpine.raw(this.designSchemes)));
+                  AppStorage.setItem('sophia_active_scheme', id);
                   
                   UIManager.showToast('装扮方案已保存');
               },
@@ -5600,7 +5479,7 @@
                   if (scheme) {
                       this.dressUp = { ...this.dressUp, ...scheme.data, activeScheme: id };
                       this.applyDressUp();
-                      localStorage.setItem('sophia_active_scheme', id);
+                      AppStorage.setItem('sophia_active_scheme', id);
                       if (showToast) UIManager.showToast(`已加载方案：${scheme.name}`);
                   }
               },
@@ -5622,8 +5501,8 @@
                               activeScheme: null
                           };
                           this.applyDressUp();
-                          localStorage.removeItem('sophia_draft');
-                          localStorage.removeItem('sophia_active_scheme');
+                          AppStorage.removeItem('sophia_draft');
+                          AppStorage.removeItem('sophia_active_scheme');
                           UIManager.showToast('已重置全部装扮');
                       }
                   };
@@ -5706,6 +5585,10 @@
               openApp(app) {
                 if (app.title === '聊天') {
                   this.activeApp = 'chat';
+                  window.dispatchEvent(new CustomEvent('init-chat'));
+                } else if (app.title === '我的' || app.title === '设置') {
+                  this.activeApp = 'chat';
+                  window.sessionStorage.setItem('sophia_active_tab', 'settings');
                   window.dispatchEvent(new CustomEvent('init-chat'));
                 } else {
                   UIManager.showToast('该应用正在开发中');
@@ -6384,1045 +6267,112 @@
 
         document.addEventListener('alpine:init', () => {
             Alpine.data('chatApp', () => ({
-                activeTab: 'list', // 'list', 'chat', 'create', 'settings'
+                activeTab: window.sessionStorage.getItem('sophia_active_tab') || 'list', // 'list', 'chat', 'create', 'settings'
+                
                 panelOpen: false,
                 menuOpen: false,
-                showClearModal: false,
-                showMemoryManager: false,
                 isLandscape: false,
-                msgMenuOpen: false,
-                selectedMsg: null,
                 
-                sessions: [],
-                currentSessionId: null,
-                messages: [],
                 
-                inputText: '',
-                isGenerating: false,
-                isGeneratingVerdict: false,
+                
+                
+                
+                
+                
                 
                 // P1 Features State
-                isOfflineMode: false,
-                offlineTheme: 'midnight', // 'midnight' or 'afternoon'
-                chatBgUrl: localStorage.getItem('sophia_chat_bgurl') || '',
                 
-                memorySettings: { retention: 30, autoExtract: true },
-                coreMemories: [],
-                showMemoryManager: false,
                 
-                courtCases: [],
-                showCourt: false,
-                currentCase: null,
                 
-                gifts: [],
-                showGiftWall: false,
                 
-                diaries: [],
-                showDiaryBook: false,
                 
-                newRole: {
-                    name: '',
-                    tag: '',
-                    prompt: '',
-                    greeting: '',
-                    avatar: ''
-                },
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
                 
                 // Settings
-                apiKey: localStorage.getItem('sophia_api_key') || '',
-                apiUrl: localStorage.getItem('sophia_api_url') || 'https://api.openai.com/v1/chat/completions',
-                apiModel: localStorage.getItem('sophia_api_model') || 'gpt-4o-mini',
+                
+                
+                
                 // API Settings New UI State
-                showApiResetConfirm: false,
-                apiShowKey: false,
-                circleEnabled: false,
-                roleStatus: 'unknown',
-                circleStatus: 'unknown',
-                apiTemp: Number(localStorage.getItem('sophia_api_temp')) || 0.7,
-                apiMaxTokens: Number(localStorage.getItem('sophia_api_max_tokens')) || 300,
-                apiStream: localStorage.getItem('sophia_api_stream') !== 'false',
-                urlPresets: ['https://api.openai.com/v1/chat/completions', 'https://api.deepseek.com/v1/chat/completions', 'https://api.anthropic.com/v1/messages'],
-                modelPresets: ['gpt-4o-mini', 'gpt-4o', 'deepseek-chat', 'claude-3-5-sonnet'],
-                circleApiKey: localStorage.getItem('sophia_circle_api_key') || '',
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                ...window.SettingsApp(),
+                ...window.MemoryApp(),
+                ...window.MessageActionsApp(),
+                ...window.CourtApp(),
+                ...window.ChatEngineApp(),
+                switchTab(tab) {
+                    this.activeTab = tab;
+                    window.sessionStorage.setItem('sophia_active_tab', tab);
+                },
                 
                 init() {
+                    const storedTab = window.sessionStorage.getItem('sophia_active_tab');
+                    if (storedTab && this.activeTab !== storedTab) {
+                        this.activeTab = storedTab;
+                    }
+                    // Watchers added for debugging activeTab drops
+                    this.$watch('activeTab', (newVal, oldVal) => {
+                        console.log('👀 [DEBUG] activeTab changed:', oldVal, '→', newVal);
+                        console.trace('👀 [DEBUG] Tracing event that caused activeTab to change:');
+                    });
+                    
+                    // Also watch the global app state to ensure the entire chat app isn't being unmounted.
+                    this.$watch('activeApp', (newVal, oldVal) => {
+                        console.log('👀 [DEBUG] activeApp (desktop state) changed:', oldVal, '→', newVal);
+                        if (!newVal) {
+                            console.trace('👀 [DEBUG] chatApp was fully closed (activeApp reached falsy)!');
+                        }
+                    });
+                    
                     this.loadSessions();
                     this.loadP1Data();
                 },
                 
                 loadP1Data() {
-                    const memSettings = localStorage.getItem('sophia_memory_settings');
+                    const memSettings = AppStorage.getItem('sophia_memory_settings');
                     if (memSettings) this.memorySettings = JSON.parse(memSettings);
                     
-                    const courtCases = localStorage.getItem('sophia_court_cases');
-                    if (courtCases) this.courtCases = JSON.parse(courtCases);
                     
-                    const gifts = localStorage.getItem('sophia_gifts');
+                    
+                    const gifts = AppStorage.getItem('sophia_gifts');
                     if (gifts) this.gifts = JSON.parse(gifts);
                     
-                    const theme = localStorage.getItem('sophia_offline_theme');
+                    const theme = AppStorage.getItem('sophia_offline_theme');
                     if (theme) this.offlineTheme = theme;
                 },
                 
                 saveP1Data() {
-                    localStorage.setItem('sophia_memory_settings', JSON.stringify(this.memorySettings));
-                    localStorage.setItem('sophia_court_cases', JSON.stringify(this.courtCases));
-                    localStorage.setItem('sophia_gifts', JSON.stringify(this.gifts));
-                    localStorage.setItem('sophia_offline_theme', this.offlineTheme);
-                    localStorage.setItem('sophia_chat_bgurl', this.chatBgUrl);
+                    
+                    
+                    AppStorage.setItem('sophia_gifts', JSON.stringify(this.gifts));
+                    AppStorage.setItem('sophia_offline_theme', this.offlineTheme);
+                    AppStorage.setItem('sophia_chat_bgurl', this.chatBgUrl);
                 },
 
-                saveApiSettings() {
-                    localStorage.setItem('sophia_api_key', this.apiKey);
-                    localStorage.setItem('sophia_api_url', this.apiUrl);
-                    localStorage.setItem('sophia_api_model', this.apiModel);
-                    localStorage.setItem('sophia_api_temp', this.apiTemp);
-                    localStorage.setItem('sophia_api_max_tokens', this.apiMaxTokens);
-                    localStorage.setItem('sophia_api_stream', this.apiStream);
-                    localStorage.setItem('sophia_circle_api_key', this.circleApiKey);
-                },
-
-                testApiConnection(type) {
-                    this[type + 'Status'] = 'unknown';
-                    window.UIManager.showToast('正在拨通星际网络...');
-                    setTimeout(() => {
-                        const isOk = Math.random() > 0.2;
-                        this[type + 'Status'] = isOk ? 'online' : 'offline';
-                        window.UIManager.showToast(isOk ? '连接成功 ✨' : '连接失败，检查配置 ❌');
-                    }, 1200);
-                },
-
-                syncCircleConfig() {
-                    this.circleApiKey = this.apiKey;
-                    this.saveApiSettings();
-                    window.UIManager.showToast('配置同步成功');
-                },
-
-                resetApiToDefault() {
-                    this.apiUrl = 'https://api.openai.com/v1/chat/completions';
-                    this.apiKey = '';
-                    this.apiModel = 'gpt-4o-mini';
-                    this.apiTemp = 0.7;
-                    this.apiMaxTokens = 300;
-                    this.apiStream = true;
-                    this.circleApiKey = '';
-                    this.roleStatus = 'unknown';
-                    this.circleEnabled = false;
-                    this.showApiResetConfirm = false;
-                    this.saveApiSettings();
-                    window.UIManager.showToast('一切已回到初始状态');
-                },
-                
-                exportChatData() {
-                    const data = {
-                        sessions: this.sessions,
-                        messages: this.messages,
-                        coreMemories: this.coreMemories,
-                        settings: {
-                            apiKey: this.apiKey,
-                            apiUrl: this.apiUrl,
-                            apiModel: this.apiModel,
-                            apiTemp: this.apiTemp,
-                            apiMaxTokens: this.apiMaxTokens,
-                            apiStream: this.apiStream,
-                            circleApiKey: this.circleApiKey,
-                            offlineTheme: this.offlineTheme,
-                            chatBgUrl: this.chatBgUrl,
-                            memorySettings: this.memorySettings
-                        }
-                    };
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `sophia_chatdata_${new Date().toISOString().split('T')[0]}.json`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    UIManager.showToast('聊天数据已导出成功！');
-                },
-                
-                closeApp() {
+                                closeApp() {
                     window.iosApp.activeApp = null;
-                },
-                
-                loadSessions() {
-                    const saved = localStorage.getItem('sophia_sessions');
-                    if (saved) {
-                        this.sessions = JSON.parse(saved);
-                    } else {
-                        // Default session
-                        this.sessions = [{
-                            id: 'session_1',
-                            name: 'Sophia',
-                            tag: '官方',
-                            avatar: '',
-                            prompt: '你是Sophia，一个贴心的AI助手。',
-                            greeting: '你好呀！我是Sophia，很高兴认识你~',
-                            updatedAt: Date.now(),
-                            unread: 0,
-                            lastMsg: '你好呀！我是Sophia，很高兴认识你~'
-                        }];
-                        this.saveSessions();
-                    }
-                },
-                
-                saveSessions() {
-                    localStorage.setItem('sophia_sessions', JSON.stringify(this.sessions));
-                },
-                
-                get currentSession() {
-                    return this.sessions.find(s => s.id === this.currentSessionId);
-                },
-                
-                openChat(sessionId) {
-                    this.currentSessionId = sessionId;
-                    this.loadMessages(sessionId);
-                    this.loadSessionP1Data(sessionId);
-                    
-                    // Clear unread
-                    const session = this.sessions.find(s => s.id === sessionId);
-                    if (session) {
-                        session.unread = 0;
-                        this.saveSessions();
-                    }
-                    
-                    this.activeTab = 'chat';
-                    this.scrollToBottom();
-                },
-                
-                loadSessionP1Data(sessionId) {
-                    const coreMemories = localStorage.getItem(`sophia_core_memories`);
-                    if (coreMemories) {
-                        const allMems = JSON.parse(coreMemories);
-                        this.coreMemories = allMems.filter(m => m.sessionId === sessionId);
-                    } else {
-                        this.coreMemories = [];
-                    }
-                    
-                    const diaries = localStorage.getItem(`sophia_diaries_${sessionId}`);
-                    if (diaries) this.diaries = JSON.parse(diaries);
-                    else this.diaries = [];
-                },
-                
-                toggleOfflineMode() {
-                    if (this.isOfflineMode) {
-                        // Exiting offline mode
-                        this.generateOfflineSummary();
-                        this.isOfflineMode = false;
-                    } else {
-                        // Entering offline mode
-                        this.isOfflineMode = true;
-                        UIManager.showToast('已进入线下模式');
-                    }
-                },
-                
-                async generateOfflineSummary() {
-                    const offlineMsgs = this.messages.filter(m => m.mode === 'offline');
-                    if (offlineMsgs.length < 2) {
-                        UIManager.showToast('线下对话太少，无法生成总结');
-                        return;
-                    }
-                    
-                    UIManager.showToast('正在生成剧情总结...');
-                    
-                    const prompt = `
-请总结以下线下模式的剧情，字数在500字以内。
-对话内容：
-${offlineMsgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}: ${m.content}`).join('\n')}
-`;
-                    
-                    try {
-                        const response = await fetch(this.apiUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${this.apiKey}`
-                            },
-                            body: JSON.stringify({
-                                model: this.apiModel,
-                                messages: [{ role: 'user', content: prompt }],
-                                temperature: 0.7
-                            })
-                        });
-                        
-                        if (!response.ok) throw new Error('API Error');
-                        const data = await response.json();
-                        const summaryText = data.choices[0].message.content;
-                        
-                        const summary = {
-                            id: 'summary_' + Date.now(),
-                            content: summaryText,
-                            timestamp: Date.now(),
-                            messageRange: [offlineMsgs[0].id, offlineMsgs[offlineMsgs.length - 1].id]
-                        };
-                        
-                        localStorage.setItem(`sophia_offline_summaries_${this.currentSessionId}`, JSON.stringify(summary));
-                        UIManager.showToast('剧情总结已生成并保存');
-                    } catch (e) {
-                        console.error(e);
-                        UIManager.showToast('总结生成失败，可稍后在菜单中手动触发');
-                    }
-                },
-                
-                saveCoreMemories() {
-                    const saved = localStorage.getItem('sophia_core_memories');
-                    let allMems = saved ? JSON.parse(saved) : [];
-                    // Remove current session's memories and append updated ones
-                    allMems = allMems.filter(m => m.sessionId !== this.currentSessionId);
-                    allMems = [...allMems, ...this.coreMemories];
-                    localStorage.setItem('sophia_core_memories', JSON.stringify(allMems));
-                },
-                
-                saveDiaries() {
-                    if (this.currentSessionId) {
-                        localStorage.setItem(`sophia_diaries_${this.currentSessionId}`, JSON.stringify(this.diaries));
-                    }
-                },
-                
-                confirmMemory(id) {
-                    const mem = this.coreMemories.find(m => m.id === id);
-                    if (mem) {
-                        mem.status = 'confirmed';
-                        this.saveCoreMemories();
-                    }
-                },
-                
-                deleteMemory(id) {
-                    this.coreMemories = this.coreMemories.filter(m => m.id !== id);
-                    this.saveCoreMemories();
-                },
-                
-                toggleGiftPrecious(id) {
-                    const gift = this.gifts.find(g => g.id === id);
-                    if (gift) {
-                        gift.isPrecious = !gift.isPrecious;
-                        this.saveP1Data();
-                    }
-                },
-                
-                loadMessages(sessionId) {
-                    const saved = localStorage.getItem(`sophia_messages_${sessionId}`);
-                    if (saved) {
-                        this.messages = JSON.parse(saved);
-                    } else {
-                        const session = this.sessions.find(s => s.id === sessionId);
-                        if (session && session.greeting) {
-                            this.messages = [{
-                                id: 'msg_' + Date.now(),
-                                role: 'assistant',
-                                content: session.greeting,
-                                type: 'text',
-                                timestamp: Date.now()
-                            }];
-                            this.saveMessages();
-                        } else {
-                            this.messages = [];
-                        }
-                    }
-                },
-                
-                saveMessages() {
-                    if (this.currentSessionId) {
-                        localStorage.setItem(`sophia_messages_${this.currentSessionId}`, JSON.stringify(this.messages));
-                    }
-                },
-                
-                scrollToBottom() {
-                    this.$nextTick(() => {
-                        const container = this.$refs.messageContainer;
-                        if (container) {
-                            container.scrollTop = container.scrollHeight;
-                        }
-                    });
-                },
-                
-                async sendMessage() {
-                    if (!this.inputText.trim() || this.isGenerating) return;
-                    
-                    if (!this.apiKey) {
-                        UIManager.showToast('请先在设置中配置API Key');
-                        this.activeTab = 'settings';
-                        return;
-                    }
-                    
-                    const userMsg = {
-                        id: 'msg_' + Date.now(),
-                        role: 'user',
-                        content: this.inputText.trim(),
-                        type: 'text',
-                        mode: this.isOfflineMode ? 'offline' : 'online',
-                        timestamp: Date.now()
-                    };
-                    
-                    this.messages.push(userMsg);
-                    this.inputText = '';
-                    this.scrollToBottom();
-                    this.saveMessages();
-                    
-                    this.updateSessionLastMsg(userMsg.content);
-                    
-                    await this.generateReply();
-                },
-                
-                handlePanelAction(action) {
-                    if (action === 'image') {
-                        this.openImagePicker('发送图片', '', (url) => this.sendImage(url));
-                    } else if (action === 'court') {
-                        this.openCourt();
-                    } else if (action === 'gift') {
-                        this.panelOpen = false;
-                        // For simplicity, we just trigger a random gift from user to bot
-                        const gifts = [
-                            {name: '鲜花', icon: '💐', desc: '送你一束花'},
-                            {name: '奶茶', icon: '🧋', desc: '请你喝奶茶'},
-                            {name: '小蛋糕', icon: '🍰', desc: '甜甜的蛋糕'}
-                        ];
-                        const g = gifts[Math.floor(Math.random() * gifts.length)];
-                        
-                        const userMsg = {
-                            id: 'msg_' + Date.now(),
-                            role: 'user',
-                            content: `[送出礼物: ${g.name}]`,
-                            type: 'text',
-                            mode: this.isOfflineMode ? 'offline' : 'online',
-                            timestamp: Date.now()
-                        };
-                        this.messages.push(userMsg);
-                        this.saveMessages();
-                        this.scrollToBottom();
-                        this.updateSessionLastMsg(userMsg.content);
-                        
-                        // Bot reacts to gift
-                        this.currentSession.prompt += `\n[系统提示: 用户刚刚送了你${g.name}，请在下一条回复中表示感谢并表现出开心。]`;
-                        this.saveSessions();
-                        this.generateReply();
-                        
-                    } else if (action === 'diary') {
-                        this.panelOpen = false;
-                        this.generateDiary();
-                    } else {
-                        this.showDevToast();
-                    }
-                },
-                
-                sendImage(url) {
-                    if (!url) return;
-                    const userMsg = {
-                        id: 'msg_' + Date.now(),
-                        role: 'user',
-                        content: '[图片]',
-                        type: 'image',
-                        imageId: url,
-                        mode: this.isOfflineMode ? 'offline' : 'online',
-                        timestamp: Date.now()
-                    };
-                    this.messages.push(userMsg);
-                    this.saveMessages();
-                    this.scrollToBottom();
-                    this.panelOpen = false;
-                    this.updateSessionLastMsg('[图片]');
-                    // Trigger AI reply after image
-                    this.generateReply();
-                },
-                
-                updateSessionLastMsg(content) {
-                    const session = this.currentSession;
-                    if (session) {
-                        session.lastMsg = content;
-                        session.updatedAt = Date.now();
-                        this.saveSessions();
-                    }
-                },
-                
-                async generateReply() {
-                    this.isGenerating = true;
-                    
-                    const botMsg = {
-                        id: 'msg_' + Date.now(),
-                        role: 'assistant',
-                        content: '',
-                        type: 'text',
-                        mode: this.isOfflineMode ? 'offline' : 'online',
-                        timestamp: Date.now()
-                    };
-                    this.messages.push(botMsg);
-                    this.scrollToBottom();
-                    
-                    const session = this.currentSession;
-                    let systemPrompt = session ? session.prompt : 'You are a helpful assistant.';
-                    
-                    // Inject Core Memories
-                    const confirmedMemories = this.coreMemories.filter(m => m.status === 'confirmed').slice(-20);
-                    if (confirmedMemories.length > 0) {
-                        systemPrompt += `\n\n[用户记忆]\n${confirmedMemories.map(m => `- ${m.content}`).join('\n')}`;
-                    }
-                    
-                    // Inject Offline Mode Instructions
-                    if (this.isOfflineMode) {
-                        const savedSummary = localStorage.getItem(`sophia_offline_summaries_${this.currentSessionId}`);
-                        if (savedSummary) {
-                            const summaryObj = JSON.parse(savedSummary);
-                            systemPrompt += `\n\n[前情提要]\n${summaryObj.content}`;
-                        }
-                        
-                        systemPrompt += `\n\n当前处于线下模式。请以小说风格回复，包含旁白、动作描写和环境描写。
-格式示例：
-Sophia轻轻放下手中的咖啡杯，抬起头看着你，眼中带着一丝笑意。
-「今天怎么想起约我出来了？」
-窗外的阳光洒在她身上，空气里有淡淡的花香。`;
-                    }
-                    
-                    // Inject Gift Prompt
-                    if (session && session.pendingGift) {
-                        systemPrompt += `\n\n[礼物触发]
-本次回复请在末尾附带礼物，格式：
-<EICS>{"eics_type":"gift","name":"礼物名称","desc":"祝福语","icon":"礼物图标emoji"}</EICS>
-礼物名称从以下列表选择：鲜花、蛋糕、小熊、咖啡杯、音乐盒、星星瓶、羽毛笔、小皇冠
-祝福语基于角色人设生成，不超过30字。`;
-                        session.pendingGift = false;
-                    }
-                    
-                    const apiMessages = [
-                        { role: 'system', content: systemPrompt },
-                        ...this.messages.slice(0, -1).map(m => {
-                            if (m.type === 'image') {
-                                return { role: m.role, content: '[用户发送了一张图片]' };
-                            }
-                            return { role: m.role, content: m.content };
-                        })
-                    ];
-                    
-                    try {
-                        const response = await fetch(this.apiUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${this.apiKey}`
-                            },
-                            body: JSON.stringify({
-                                model: this.apiModel,
-                                messages: apiMessages,
-                                stream: true,
-                                temperature: 0.7
-                            })
-                        });
-                        
-                        if (!response.ok) {
-                            if (response.status === 401) {
-                                throw new Error('API Key无效，请检查配置');
-                            }
-                            throw new Error(`API请求失败: ${response.status}`);
-                        }
-                        
-                        const reader = response.body.getReader();
-                        const decoder = new TextDecoder('utf-8');
-                        let done = false;
-                        
-                        let eicsBuffer = '';
-                        let inEics = false;
-                        
-                        while (!done) {
-                            const { value, done: readerDone } = await reader.read();
-                            done = readerDone;
-                            if (value) {
-                                const chunk = decoder.decode(value, { stream: !done });
-                                const lines = chunk.split('\n').filter(line => line.trim() !== '');
-                                
-                                for (const line of lines) {
-                                    if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-                                        try {
-                                            const data = JSON.parse(line.slice(6));
-                                            if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
-                                                const text = data.choices[0].delta.content;
-                                                
-                                                // EICS Interception Logic
-                                                if (text.includes('<EICS>')) {
-                                                    inEics = true;
-                                                    const parts = text.split('<EICS>');
-                                                    if (parts[0]) botMsg.content += parts[0];
-                                                    eicsBuffer = parts[1] || '';
-                                                } else if (inEics) {
-                                                    eicsBuffer += text;
-                                                    if (eicsBuffer.includes('</EICS>')) {
-                                                        inEics = false;
-                                                        const parts = eicsBuffer.split('</EICS>');
-                                                        const jsonStr = parts[0];
-                                                        try {
-                                                            const eicsData = JSON.parse(jsonStr);
-                                                            if (!botMsg.eics) botMsg.eics = [];
-                                                            botMsg.eics.push(eicsData);
-                                                        } catch(e) {
-                                                            console.error('EICS Parse Error', e);
-                                                        }
-                                                        if (parts[1]) botMsg.content += parts[1];
-                                                        eicsBuffer = '';
-                                                    }
-                                                } else {
-                                                    botMsg.content += text;
-                                                }
-                                                this.scrollToBottom();
-                                            }
-                                        } catch (e) {
-                                            console.error('Error parsing stream chunk', e);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        this.saveMessages();
-                        this.updateSessionLastMsg(botMsg.content);
-                        
-                        // Async Memory Extraction
-                        if (this.memorySettings.autoExtract) {
-                            this.extractCoreMemory();
-                        }
-                        
-                        // Async Gift Check
-                        this.checkGiftTrigger();
-                        
-                    } catch (error) {
-                        console.error(error);
-                        botMsg.content = `[发送失败: ${error.message}]`;
-                        this.saveMessages();
-                        if (error.message.includes('API Key无效')) {
-                            UIManager.showToast(error.message);
-                            this.activeTab = 'settings';
-                        } else {
-                            UIManager.showToast('网络中断或请求失败');
-                        }
-                    } finally {
-                        this.isGenerating = false;
-                    }
-                },
-                
-                async generateDailySummary() {
-                    UIManager.showToast('正在生成今日记忆摘要...');
-                    
-                    const today = new Date().toDateString();
-                    const todayMsgs = this.messages.filter(m => new Date(m.timestamp).toDateString() === today);
-                    
-                    if (todayMsgs.length === 0) {
-                        UIManager.showToast('今日没有对话记录');
-                        return;
-                    }
-                    
-                    const prompt = `
-请根据以下今天的聊天记录，总结一份今日记忆摘要。
-字数在200字以内。
-聊天记录：
-${todayMsgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}: ${m.content}`).join('\n')}
-`;
-                    try {
-                        const response = await fetch(this.apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` },
-                            body: JSON.stringify({
-                                model: this.apiModel,
-                                messages: [{ role: 'user', content: prompt }],
-                                temperature: 0.5
-                            })
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            const summaryText = data.choices[0].message.content.trim();
-                            
-                            const summary = {
-                                id: 'summary_' + Date.now(),
-                                date: today,
-                                content: summaryText,
-                                timestamp: Date.now()
-                            };
-                            
-                            localStorage.setItem(`sophia_memory_summaries_${this.currentSessionId}`, JSON.stringify(summary));
-                            UIManager.showToast('今日记忆摘要已生成');
-                        } else {
-                            UIManager.showToast('摘要生成失败');
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        UIManager.showToast('摘要生成失败');
-                    }
-                },
-                
-                async extractCoreMemory() {
-                    const msgs = this.messages.slice(-2);
-                    if (msgs.length < 2 || msgs[0].role !== 'user') return;
-                    
-                    const prompt = `
-请分析以下对话，提取值得长期记住的用户信息。
-只提取高置信度的事实性信息，不要推测。
-输出JSON格式：
-{"new_memories": [{"content": "记忆内容", "type": "preference|habit|fact|event", "confidence": 0.0-1.0}]}
-只输出JSON，不要其他文字。
-
-对话内容：
-用户: ${msgs[0].content}
-角色: ${msgs[1].content}
-`;
-                    try {
-                        const response = await fetch(this.apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` },
-                            body: JSON.stringify({
-                                model: this.apiModel,
-                                messages: [{ role: 'user', content: prompt }],
-                                temperature: 0.1
-                            })
-                        });
-                        if (!response.ok) return;
-                        const data = await response.json();
-                        let text = data.choices[0].message.content;
-                        // Clean markdown json blocks if any
-                        text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                        const result = JSON.parse(text);
-                        
-                        if (result.new_memories && result.new_memories.length > 0) {
-                            result.new_memories.forEach(mem => {
-                                if (mem.confidence >= 0.8) {
-                                    this.coreMemories.push({
-                                        id: 'mem_' + Date.now() + Math.random().toString(36).substr(2, 5),
-                                        content: mem.content,
-                                        type: mem.type,
-                                        confidence: mem.confidence,
-                                        status: 'pending',
-                                        sessionId: this.currentSessionId,
-                                        createdAt: Date.now(),
-                                        expiresAt: this.memorySettings.retention === 'forever' ? null : Date.now() + this.memorySettings.retention * 24 * 60 * 60 * 1000
-                                    });
-                                }
-                            });
-                            this.saveCoreMemories();
-                        }
-                    } catch (e) {
-                        console.error('Memory extraction failed', e);
-                    }
-                },
-                
-                markAsCoreMemory() {
-                    if (this.selectedMsg) {
-                        const content = this.selectedMsg.content;
-                        if (content) {
-                            this.coreMemories.push({
-                                id: 'mem_' + Date.now(),
-                                content: content,
-                                type: 'fact',
-                                confidence: 1.0,
-                                status: 'confirmed',
-                                sessionId: this.currentSessionId,
-                                createdAt: Date.now(),
-                                expiresAt: this.memorySettings.retention === 'forever' ? null : Date.now() + this.memorySettings.retention * 24 * 60 * 60 * 1000
-                            });
-                            this.saveCoreMemories();
-                            UIManager.showToast('已保存为核心记忆');
-                        }
-                    }
-                    this.msgMenuOpen = false;
-                },
-                
-                async checkGiftTrigger() {
-                    // Basic probability 15%
-                    if (Math.random() > 0.15) return;
-                    
-                    // Check if already sent 3 gifts today
-                    const today = new Date().toDateString();
-                    const todayGifts = this.gifts.filter(g => new Date(g.receivedAt).toDateString() === today);
-                    if (todayGifts.length >= 3) return;
-                    
-                    // Trigger gift in next message by setting a flag
-                    this.currentSession.pendingGift = true;
-                },
-                
-                acceptGift(msg, eIdx) {
-                    const eics = msg.eics[eIdx];
-                    eics.actionTaken = 'accepted';
-                    
-                    this.gifts.unshift({
-                        id: 'gift_' + Date.now(),
-                        name: eics.name,
-                        icon: eics.icon,
-                        desc: eics.desc,
-                        from: this.currentSessionId,
-                        fromName: this.currentSession.name,
-                        receivedAt: Date.now(),
-                        isPrecious: false
-                    });
-                    this.saveP1Data();
-                    this.saveMessages();
-                    
-                    // Add core memory
-                    this.coreMemories.push({
-                        id: 'mem_' + Date.now(),
-                        content: `${this.currentSession.name}送过用户${eics.name}`,
-                        type: 'event',
-                        confidence: 1.0,
-                        status: 'pending',
-                        sessionId: this.currentSessionId,
-                        createdAt: Date.now(),
-                        expiresAt: this.memorySettings.retention === 'forever' ? null : Date.now() + this.memorySettings.retention * 24 * 60 * 60 * 1000
-                    });
-                    this.saveCoreMemories();
-                },
-                
-                rejectGift(msg, eIdx) {
-                    const eics = msg.eics[eIdx];
-                    eics.actionTaken = 'rejected';
-                    this.saveMessages();
-                    
-                    // Inject rejection prompt for next reply
-                    this.currentSession.prompt += `\n[系统提示: 用户刚刚婉拒了你送的${eics.name}，请在下一条回复中表现出短暂的情绪反应（失落、理解等）。]`;
-                    this.saveSessions();
-                },
-                
-                async openCourt() {
-                    this.panelOpen = false;
-                    this.showCourt = true;
-                    this.currentCase = {
-                        caseNumber: 'CASE-' + Date.now().toString().slice(-6),
-                        plaintiff: '我',
-                        defendant: this.currentSession.name,
-                        caseReason: '',
-                        verdict: null,
-                        verdictText: null
-                    };
-                    
-                    // Generate case reason
-                    const msgs = this.messages.slice(-10);
-                    const prompt = `
-请根据以下最近的聊天记录，总结一个“小狗法庭”的案由。
-案由应该是有趣的、生活化的抱怨，比如“回复太慢”、“说话太敷衍”、“不关心我”等。
-字数不超过15字。
-聊天记录：
-${msgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}: ${m.content}`).join('\n')}
-`;
-                    try {
-                        const response = await fetch(this.apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` },
-                            body: JSON.stringify({
-                                model: this.apiModel,
-                                messages: [{ role: 'user', content: prompt }],
-                                temperature: 0.7
-                            })
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            this.currentCase.caseReason = data.choices[0].message.content.trim();
-                        }
-                    } catch (e) {
-                        this.currentCase.caseReason = '感情纠纷';
-                    }
-                },
-                
-                async generateDiary() {
-                    UIManager.showToast('正在生成今日日记...');
-                    
-                    const msgs = this.messages.slice(-20);
-                    const prompt = `
-请根据以下最近的聊天记录，以${this.currentSession.name}的口吻写一篇日记。
-日记应该包含对今天聊天的感受、对用户的看法，以及一些生活细节的想象。
-字数在800字左右。
-聊天记录：
-${msgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}: ${m.content}`).join('\n')}
-`;
-                    try {
-                        const response = await fetch(this.apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` },
-                            body: JSON.stringify({
-                                model: this.apiModel,
-                                messages: [{ role: 'user', content: prompt }],
-                                temperature: 0.7
-                            })
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            const content = data.choices[0].message.content.trim();
-                            
-                            const diary = {
-                                id: 'diary_' + Date.now(),
-                                date: new Date().toLocaleDateString(),
-                                content: content,
-                                timestamp: Date.now()
-                            };
-                            this.diaries.unshift(diary);
-                            this.saveDiaries();
-                            
-                            // Send diary as EICS card in chat
-                            const botMsg = {
-                                id: 'msg_' + Date.now(),
-                                role: 'assistant',
-                                content: '',
-                                type: 'text',
-                                mode: this.isOfflineMode ? 'offline' : 'online',
-                                timestamp: Date.now(),
-                                eics: [{
-                                    eics_type: 'diary',
-                                    date: diary.date,
-                                    content: diary.content
-                                }]
-                            };
-                            this.messages.push(botMsg);
-                            this.saveMessages();
-                            this.scrollToBottom();
-                            
-                            // Add core memory that user peeked at diary
-                            this.coreMemories.push({
-                                id: 'mem_' + Date.now(),
-                                content: `用户偷看了${this.currentSession.name}的日记`,
-                                type: 'event',
-                                confidence: 1.0,
-                                status: 'confirmed',
-                                sessionId: this.currentSessionId,
-                                createdAt: Date.now(),
-                                expiresAt: this.memorySettings.retention === 'forever' ? null : Date.now() + this.memorySettings.retention * 24 * 60 * 60 * 1000
-                            });
-                            this.saveCoreMemories();
-                            
-                        } else {
-                            UIManager.showToast('日记生成失败');
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        UIManager.showToast('日记生成失败');
-                    }
-                },
-                
-                async generateVerdict() {
-                    this.isGeneratingVerdict = true;
-                    const msgs = this.messages.slice(-10);
-                    const prompt = `
-你现在是“小狗法庭”的法官（一只可爱但公正的小狗）。
-原告：我
-被告：${this.currentSession.name}
-案由：${this.currentCase.caseReason}
-
-请根据以下聊天记录，给出一份判决书。
-判决书风格：幽默、可爱、偏袒某一方（随机）。
-最后必须给出一个明确的判决结果（如：被告罚抄写“我爱你”三遍，或原告无理取闹驳回起诉）。
-
-输出JSON格式：
-{"verdictText": "判决书正文（约100字）", "verdict": "一句话判决结果"}
-
-聊天记录：
-${msgs.map(m => `${m.role === 'user' ? '我' : this.currentSession.name}: ${m.content}`).join('\n')}
-`;
-                    try {
-                        const response = await fetch(this.apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` },
-                            body: JSON.stringify({
-                                model: this.apiModel,
-                                messages: [{ role: 'user', content: prompt }],
-                                temperature: 0.8
-                            })
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            let text = data.choices[0].message.content;
-                            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                            const result = JSON.parse(text);
-                            
-                            this.currentCase.verdictText = result.verdictText;
-                            this.currentCase.verdict = result.verdict;
-                            
-                            // Save case
-                            this.courtCases.unshift({
-                                ...this.currentCase,
-                                date: Date.now()
-                            });
-                            if (this.courtCases.length > 100) this.courtCases.pop();
-                            this.saveP1Data();
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        this.currentCase.verdictText = '法官小狗睡着了，无法给出判决...';
-                        this.currentCase.verdict = '休庭';
-                    } finally {
-                        this.isGeneratingVerdict = false;
-                    }
-                },
-                
-                createRole() {
-                    if (!this.newRole.name || !this.newRole.prompt) {
-                        UIManager.showToast('角色名和设定为必填项');
-                        return;
-                    }
-                    
-                    const newSession = {
-                        id: 'session_' + Date.now(),
-                        name: this.newRole.name,
-                        tag: this.newRole.tag,
-                        avatar: this.newRole.avatar,
-                        prompt: this.newRole.prompt,
-                        greeting: this.newRole.greeting,
-                        updatedAt: Date.now(),
-                        unread: 0,
-                        lastMsg: this.newRole.greeting || '新角色已创建'
-                    };
-                    
-                    this.sessions.unshift(newSession);
-                    this.saveSessions();
-                    
-                    // Reset form
-                    this.newRole = { name: '', tag: '', prompt: '', greeting: '', avatar: '' };
-                    this.activeTab = 'list';
-                    UIManager.showToast('角色创建成功');
-                },
-                
-                saveSettings() {
-                    localStorage.setItem('sophia_api_key', this.apiKey);
-                    localStorage.setItem('sophia_api_url', this.apiUrl);
-                    localStorage.setItem('sophia_api_model', this.apiModel);
-                    UIManager.showToast('设置已保存');
-                    this.activeTab = 'list';
-                },
-                
-                formatTime(ts) {
-                    const d = new Date(ts);
-                    return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-                },
-                
-                showDevToast() {
-                    UIManager.showToast('该功能正在开发中，敬请期待～');
-                },
-                
-                openImagePicker(title, currentUrl, callback) {
-                    window.iosApp.openImagePicker(title, currentUrl, callback);
-                },
-                
-                // Message Menu
-                openMessageMenu(msg) {
-                    this.selectedMsg = msg;
-                    this.msgMenuOpen = true;
-                },
-                
-                copyMessage() {
-                    if (this.selectedMsg) {
-                        navigator.clipboard.writeText(this.selectedMsg.content);
-                        UIManager.showToast('已复制到剪贴板');
-                    }
-                    this.msgMenuOpen = false;
-                },
-                
-                deleteMessage() {
-                    if (this.selectedMsg) {
-                        this.messages = this.messages.filter(m => m.id !== this.selectedMsg.id);
-                        this.saveMessages();
-                        UIManager.showToast('消息已删除');
-                    }
-                    this.msgMenuOpen = false;
-                },
-                
-                clearHistory() {
-                    this.messages = [];
-                    this.saveMessages();
-                    this.updateSessionLastMsg('');
-                    this.menuOpen = false;
-                    this.showClearModal = false;
-                    UIManager.showToast('对话已清空');
                 }
             }));
         });

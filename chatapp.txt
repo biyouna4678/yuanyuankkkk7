@@ -1,0 +1,203 @@
+3955:    <div x-show="activeApp === 'chat'" class="absolute inset-0 z-[100] bg-sophia-bg flex flex-col" x-data="chatApp()" @init-chat.window="init()" style="display: none;" x-transition>
+3956-        
+3957-        <!-- List Tab -->
+3958-        <div x-show="activeTab === 'list'" class="h-full flex flex-col relative bg-[#fdf2f7] overflow-hidden">
+3959-            <!-- Header -->
+3960-            <div class="text-center py-2.5 relative shrink-0 pt-10">
+3961-                <div class="text-[13px] text-gray-800 flex items-center justify-center gap-1.5">
+3962-                    剩余未读留言99+ 
+3963-                    <svg width="16" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+3964-                </div>
+3965-                <!-- Remove activeTab='create' button to send-btn place, maintaining app functionality -->
+3966-                <div @click="activeTab = 'create'" class="absolute right-4 top-10 text-sm text-gray-400 cursor-pointer">
+3967-                    Send
+3968-                </div>
+3969-            </div>
+3970-            
+3971-            <!-- List Content -->
+3972-            <div class="flex-1 overflow-y-auto no-scrollbar pb-24">
+3973-                
+3974-                <!-- Cover Section -->
+3975-                <div class="px-4 mt-1.5">
+3976-                    <div class="bg-white rounded-[24px] overflow-hidden shadow-[0_10px_20px_rgba(255,133,178,0.05)]">
+3977-                        <!-- Background Image Placeholder (Inline SVG for exact matching) -->
+3978-                        <div class="h-[180px] bg-[#fdfdfd] border-b border-gray-50 flex items-center justify-center" style="background: #fdfdfd url('data:image/svg+xml;charset=UTF-8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22200%22><text x=%2250%25%22 y=%2250%25%22 font-size=%2220%22 fill=%22%23ddd%22 text-anchor=%22middle%22>i love u... ♡</text></svg>') center/cover"></div>
+3979-                        
+3980-                        <div class="px-5 pb-5 flex items-end -mt-9">
+3981-                            <div class="w-[75px] h-[75px] rounded-full bg-gray-200 border-4 border-white shrink-0 shadow-sm overflow-hidden flex items-center justify-center">
+3982-                                <!-- Using Sophia accent icon for default avatar -->
+3983-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FF91B9" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+3984-                            </div>
+3985-                            <div class="ml-3 mb-1">
+3986-                                <p class="text-lg font-bold text-gray-800 m-0 leading-tight">@Qikasloen</p>
+3987-                                <p class="text-xs text-gray-400 m-0 mt-0.5">#Pensée r%mpre</p>
+3988-                            </div>
+3989-                        </div>
+3990-                    </div>
+3991-                </div>
+3992-
+3993-                <!-- Unread Notice -->
+3994-                <div class="px-5 py-4 flex justify-between items-center mt-2">
+3995-                    <div class="text-[16px] font-medium flex items-center text-gray-900 gap-2">
+3996-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+3997-                        You have unread messages.
+3998-                    </div>
+3999-                    <div class="bg-black/5 px-2 py-0.5 rounded-full text-[10px] text-gray-500 flex items-center">🔗99+</div>
+4000-                </div>
+4001-
+4002-                <!-- Sessions List -->
+4003-                <div class="px-4 space-y-3">
+4004-                    <template x-for="(session, index) in sessions" :key="session.id">
+4005-                        <div @click="openChat(session.id)" class="bg-white rounded-2xl p-3 flex relative cursor-pointer active:scale-95 transition-transform shadow-sm border border-black/[0.02]">
+4006-                            <!-- Avatar Section -->
+4007-                            <div class="relative w-[52px] h-[52px] shrink-0">
+4008-                                <div class="w-full h-full rounded-xl bg-gray-100 bg-cover bg-center border border-black/5" :style="session.avatar ? `background-image: url(${$store.imageStore.get(session.avatar)})` : ''"></div>
+4009-                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-sophia-accent text-white text-[9px] px-1.5 py-px rounded-lg whitespace-nowrap shadow-sm">Follow</div>
+4010-                            </div>
+4011-                            
+4012-                            <!-- Content Section -->
+4013-                            <div class="ml-4 flex-1 min-w-0 pr-8">
+4014-                                <div class="flex items-center mb-1.5">
+4015-                                    <span class="text-[9px] px-2 py-px border border-gray-200 rounded-full text-gray-400 mr-2 shrink-0" x-text="index === 0 ? 'Pending' : (index === 1 ? 'Error' : 'Sent')"></span>
+4016-                                    <span class="font-bold text-sm text-gray-900 truncate flex items-center gap-1">
+4017-                                        <span x-text="session.name"></span>
+4018-                                        <span x-show="session.tag === '✔'" class="text-sophia-accent text-xs">✔</span>
+4019-                                        <span x-show="session.tag !== '✔' && session.tag" class="text-gray-400 text-xs" x-text="session.tag"></span>
+4020-                                    </span>
+4021-                                </div>
+4022-                                <div class="text-[13px] text-gray-500 leading-snug w-full truncate" x-text="session.lastMsg"></div>
+4023-                            </div>
+4024-                            
+4025-                            <!-- Timestamp & Unread Badge -->
+4026-                            <div class="absolute right-4 top-3 flex flex-col items-end gap-1">
+4027-                                <div class="text-[11px] text-gray-400 font-medium" x-text="formatTime(session.updatedAt)"></div>
+4028-                                <template x-if="session.unread > 0">
+4029-                                    <div class="w-2 h-2 rounded-full bg-red-400"></div>
+4030-                                </template>
+4031-                            </div>
+4032-                        </div>
+4033-                    </template>
+4034-                </div>
+4035-            </div>
+4036-            
+4037-            <!-- Bottom Floating Nav -->
+4038-            <nav class="absolute bottom-6 left-5 right-5 h-16 bg-white/85 backdrop-blur-md rounded-full flex justify-around items-center px-4 shadow-[0_8px_25px_rgba(0,0,0,0.06)] z-40 transition-transform">
+4039-                <div class="flex flex-col items-center cursor-pointer text-sophia-accent w-10">
+4040-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></svg>
+4041-                </div>
+4042-                <div @click="showDevToast()" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
+4043-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+4044-                </div>
+4045-                <!-- Middle Add Button (with red dot) -->
+4046-                <div @click="showDevToast()" class="flex flex-col items-center cursor-pointer text-gray-400 w-10 relative">
+4047-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+4048-                    <div class="absolute top-0 right-1 w-2 h-2 bg-sophia-accent rounded-full border border-white"></div>
+4049-                </div>
+4050-                <div @click="showDevToast()" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
+4051-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+4052-                </div>
+4053-                <div @click="activeTab = 'settings'" class="flex flex-col items-center cursor-pointer text-gray-400 w-10">
+4054-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+4055-                </div>
+--
+6457:            Alpine.data('chatApp', () => ({
+6458-                activeTab: 'list', // 'list', 'chat', 'create', 'settings'
+6459-                panelOpen: false,
+6460-                menuOpen: false,
+6461-                showClearModal: false,
+6462-                showMemoryManager: false,
+6463-                isLandscape: false,
+6464-                msgMenuOpen: false,
+6465-                selectedMsg: null,
+6466-                
+6467-                sessions: [],
+6468-                currentSessionId: null,
+6469-                messages: [],
+6470-                
+6471-                inputText: '',
+6472-                isGenerating: false,
+6473-                isGeneratingVerdict: false,
+6474-                
+6475-                // P1 Features State
+6476-                isOfflineMode: false,
+6477-                offlineTheme: 'midnight', // 'midnight' or 'afternoon'
+6478-                chatBgUrl: localStorage.getItem('sophia_chat_bgurl') || '',
+6479-                
+6480-                memorySettings: { retention: 30, autoExtract: true },
+6481-                coreMemories: [],
+6482-                showMemoryManager: false,
+6483-                
+6484-                courtCases: [],
+6485-                showCourt: false,
+6486-                currentCase: null,
+6487-                
+6488-                gifts: [],
+6489-                showGiftWall: false,
+6490-                
+6491-                diaries: [],
+6492-                showDiaryBook: false,
+6493-                
+6494-                newRole: {
+6495-                    name: '',
+6496-                    tag: '',
+6497-                    prompt: '',
+6498-                    greeting: '',
+6499-                    avatar: ''
+6500-                },
+6501-                
+6502-                // Settings
+6503-                apiKey: localStorage.getItem('sophia_api_key') || '',
+6504-                apiUrl: localStorage.getItem('sophia_api_url') || 'https://api.openai.com/v1/chat/completions',
+6505-                apiModel: localStorage.getItem('sophia_api_model') || 'gpt-4o-mini',
+6506-                // API Settings New UI State
+6507-                showApiResetConfirm: false,
+6508-                apiShowKey: false,
+6509-                circleEnabled: false,
+6510-                roleStatus: 'unknown',
+6511-                circleStatus: 'unknown',
+6512-                apiTemp: Number(localStorage.getItem('sophia_api_temp')) || 0.7,
+6513-                apiMaxTokens: Number(localStorage.getItem('sophia_api_max_tokens')) || 300,
+6514-                apiStream: localStorage.getItem('sophia_api_stream') !== 'false',
+6515-                urlPresets: ['https://api.openai.com/v1/chat/completions', 'https://api.deepseek.com/v1/chat/completions', 'https://api.anthropic.com/v1/messages'],
+6516-                modelPresets: ['gpt-4o-mini', 'gpt-4o', 'deepseek-chat', 'claude-3-5-sonnet'],
+6517-                circleApiKey: localStorage.getItem('sophia_circle_api_key') || '',
+6518-                
+6519-                init() {
+6520-                    this.loadSessions();
+6521-                    this.loadP1Data();
+6522-                },
+6523-                
+6524-                loadP1Data() {
+6525-                    const memSettings = localStorage.getItem('sophia_memory_settings');
+6526-                    if (memSettings) this.memorySettings = JSON.parse(memSettings);
+6527-                    
+6528-                    const courtCases = localStorage.getItem('sophia_court_cases');
+6529-                    if (courtCases) this.courtCases = JSON.parse(courtCases);
+6530-                    
+6531-                    const gifts = localStorage.getItem('sophia_gifts');
+6532-                    if (gifts) this.gifts = JSON.parse(gifts);
+6533-                    
+6534-                    const theme = localStorage.getItem('sophia_offline_theme');
+6535-                    if (theme) this.offlineTheme = theme;
+6536-                },
+6537-                
+6538-                saveP1Data() {
+6539-                    localStorage.setItem('sophia_memory_settings', JSON.stringify(this.memorySettings));
+6540-                    localStorage.setItem('sophia_court_cases', JSON.stringify(this.courtCases));
+6541-                    localStorage.setItem('sophia_gifts', JSON.stringify(this.gifts));
+6542-                    localStorage.setItem('sophia_offline_theme', this.offlineTheme);
+6543-                    localStorage.setItem('sophia_chat_bgurl', this.chatBgUrl);
+6544-                },
+6545-
+6546-                saveApiSettings() {
+6547-                    localStorage.setItem('sophia_api_key', this.apiKey);
+6548-                    localStorage.setItem('sophia_api_url', this.apiUrl);
+6549-                    localStorage.setItem('sophia_api_model', this.apiModel);
+6550-                    localStorage.setItem('sophia_api_temp', this.apiTemp);
+6551-                    localStorage.setItem('sophia_api_max_tokens', this.apiMaxTokens);
+6552-                    localStorage.setItem('sophia_api_stream', this.apiStream);
+6553-                    localStorage.setItem('sophia_circle_api_key', this.circleApiKey);
+6554-                },
+6555-
+6556-                testApiConnection(type) {
+6557-                    this[type + 'Status'] = 'unknown';
