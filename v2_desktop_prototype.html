@@ -175,6 +175,7 @@ const html = `<!DOCTYPE html>
 
     <script>
         const initData = [
+            // 第一屏
             { id: 'app1', type: 'app', label: '轻盈计划', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M10 24 Q16 22 24 8 Q18 8 10 16 Z" class="s-line"/><path d="M11 23 L14 20 M17 17 L20 14" class="s-line" stroke-width="2.2"/></svg>' },
             { id: 'app2', type: 'app', label: '查手机', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect x="9" y="4" width="14" height="24" rx="3.5" class="s-line" /><line x1="13" y1="24" x2="19" y2="24" class="s-line" stroke-width="2" opacity="0.4" /><circle cx="16" cy="6.5" r="0.8" class="s-fill" /></svg>' },
             { id: 'app3', type: 'app', label: '情侣空间', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M11 8 C6 4, 1 9, 11 19 C21 9, 16 4, 11 8" class="s-line" stroke-width="3.2"/><path d="M22 15 C19 12, 16 16, 22 22 C28 16, 25 12, 22 15" class="s-line" stroke-width="2.5"/></svg>' },
@@ -182,14 +183,26 @@ const html = `<!DOCTYPE html>
             { id: 'app5', type: 'app', label: '心动OOTD', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M7 6 Q7 4 9 4 H23 Q25 4 25 6 V26 Q25 28 23 28 H9 Q7 28 7 26 Z" class="s-line" /><line x1="16" y1="4" x2="16" y2="28" class="s-line" stroke-width="1.5" /><circle cx="13.5" cy="16" r="1" class="s-fill" /><circle cx="18.5" cy="16" r="1" class="s-fill" /></svg>' },
             { id: 'app6', type: 'app', label: '解梦', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M22 20 A8 8 0 1 1 12 10 A6 6 0 0 0 22 20" class="s-line"/><path d="M22 6 L22.5 6 M26 10 L26.5 10" class="s-line" stroke-width="4"/></svg>' },
             { id: 'app7', type: 'app', label: '塔罗牌', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 6 L19 13 H26 L21 18 L23 26 L16 21 L9 26 L11 18 L6 13 H13 Z" class="s-line"/></svg>' },
-            { id: 'app8', type: 'app', label: '世界书', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M9 5 H23 C24 5 25 6 25 7 V23 C25 24 24 25 23 25 H9 C8 25 7 24 7 23 V7 C7 6 8 5 9 5 Z" class="s-line" /><path d="M7 23 C7 25 8 27 10 27 H25 V25" class="s-line" /><path d="M25 25 C23 25 22 24 22 23" class="s-line" /><path d="M11 5 V16 L14 13 L17 16 V5" class="s-line" stroke-width="2.5" /></svg>' }
+            { id: 'app8', type: 'app', label: '世界书', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M9 5 H23 C24 5 25 6 25 7 V23 C25 24 24 25 23 25 H9 C8 25 7 24 7 23 V7 C7 6 8 5 9 5 Z" class="s-line" /><path d="M7 23 C7 25 8 27 10 27 H25 V25" class="s-line" /><path d="M25 25 C23 25 22 24 22 23" class="s-line" /><path d="M11 5 V16 L14 13 L17 16 V5" class="s-line" stroke-width="2.5" /></svg>' },
+            { id: 'app9', type: 'app', label: '设置', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 12 A4 4 0 1 1 16 20 A4 4 0 1 1 16 12" class="s-line" /><path d="M14.5 4.5 L17.5 4.5 L18 7 Q19 7.5 20 8 L22.5 7 L24.5 9 L23 11.5 Q23.5 12.5 24 13.5 L27 14 L27 17 L24 17.5 Q23.5 18.5 23 19.5 L24.5 22 L22.5 24 L20 23 Q19 23.5 18 24 L17.5 27 L14.5 27 L14 24 Q13 23.5 12 23 L9.5 24 L7.5 22 L9 19.5 Q8.5 18.5 8 17.5 L5 17 L5 14 L8 13.5 Q8.5 12.5 9 11.5 L7.5 9 L9.5 7 L12 8 Q13 7.5 14 7 Z" class="s-line" stroke-width="2.5" /></svg>' },
+            
+            // 第二屏
+            { id: 'app10', type: 'app', label: '学习陪伴', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M6 8 L26 8 L26 24 L6 24 Z" class="s-line"/><path d="M14 14 L18 14 M14 18 L18 18" class="s-line"/></svg>' },
+            { id: 'app11', type: 'app', label: '外卖订单', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 8 C11 8 7 14 7 18 L25 18 C25 14 21 8 16 8 Z" class="s-line"/><path d="M16 4 L16 8 M6 22 L26 22" class="s-line"/></svg>' },
+            { id: 'app12', type: 'app', label: '直播', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="4" class="s-line"/><path d="M10 16 A 6 6 0 0 1 16 10 M22 16 A 6 6 0 0 0 16 10" class="s-line"/><path d="M6 16 A 10 10 0 0 1 16 6 M26 16 A 10 10 0 0 0 16 6" class="s-line"/></svg>' },
+            { id: 'app13', type: 'app', label: '论坛', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M6 12 H18 V20 H10 L6 24 Z" class="s-line"/><path d="M22 10 V16 H26 L30 20 V10 H22" class="s-line" stroke-width="2.2"/></svg>' },
+            { id: 'app14', type: 'app', label: '一起看小说', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M6 8 C8 6, 14 8, 16 12 C18 8, 24 6, 26 8 L26 26 C24 24, 18 26, 16 22 C14 26, 8 24, 6 26 Z" class="s-line"/><line x1="16" y1="12" x2="16" y2="22" class="s-line"/></svg>' },
+            { id: 'app15', type: 'app', label: '短信', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect x="4" y="9" width="24" height="16" rx="2" class="s-line"/><path d="M4 9 L16 16 L28 9" class="s-line"/></svg>' },
+            { id: 'app16', type: 'app', label: '信笺', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect x="5" y="8" width="22" height="16" rx="2" class="s-line" fill="white" /><path d="M5 8 L16 16 L27 8" class="s-line" /></svg>' },
+            { id: 'app17', type: 'app', label: '商城', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M8 12 L6 26 H26 L24 12 Z" class="s-line" fill="white" /><path d="M11 12 Q11 6, 16 6 Q21 6, 21 12" class="s-line" /><line x1="7" y1="18" x2="25" y2="18" class="s-line" stroke-width="1.5" opacity="0.4" /></svg>' },
+            { id: 'app18', type: 'app', label: '旋律星盒', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M10 20 A4 4 0 1 1 10 12 A4 4 0 1 1 10 20 Z" class="s-line"/><line x1="14" y1="16" x2="14" y2="6" class="s-line"/><path d="M14 6 C18 6, 20 8, 20 12" class="s-line"/></svg>' }
         ];
 
         const initDock = [
-            { id: 'dock1', type: 'app', label: '设置', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 12 A4 4 0 1 1 16 20 A4 4 0 1 1 16 12" class="s-line" /><path d="M14.5 4.5 L17.5 4.5 L18 7 Q19 7.5 20 8 L22.5 7 L24.5 9 L23 11.5 Q23.5 12.5 24 13.5 L27 14 L27 17 L24 17.5 Q23.5 18.5 23 19.5 L24.5 22 L22.5 24 L20 23 Q19 23.5 18 24 L17.5 27 L14.5 27 L14 24 Q13 23.5 12 23 L9.5 24 L7.5 22 L9 19.5 Q8.5 18.5 8 17.5 L5 17 L5 14 L8 13.5 Q8.5 12.5 9 11.5 L7.5 9 L9.5 7 L12 8 Q13 7.5 14 7 Z" class="s-line" stroke-width="2.5" /></svg>' },
-            { id: 'dock2', type: 'app', label: '论坛', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M6 12 H18 V20 H10 L6 24 Z" class="s-line"/><path d="M22 10 V16 H26 L30 20 V10 H22" class="s-line" stroke-width="2.2"/></svg>' },
-            { id: 'dock3', type: 'app', label: '信件', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect x="5" y="8" width="22" height="16" rx="2" class="s-line" fill="white" /><path d="M5 8 L16 16 L27 8" class="s-line" /></svg>' },
-            { id: 'dock4', type: 'app', label: '商城', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M8 12 L6 26 H26 L24 12 Z" class="s-line" fill="white" /><path d="M11 12 Q11 6, 16 6 Q21 6, 21 12" class="s-line" /><line x1="7" y1="18" x2="25" y2="18" class="s-line" stroke-width="1.5" opacity="0.4" /></svg>' }
+            { id: 'dock1', type: 'app', label: '聊天', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M26 16 C26 10, 21.5 6, 16 6 C10.5 6, 6 10, 6 16 C6 22, 10.5 26, 16 26 L26 26 L26 16 Z" class="s-line"/></svg>' },
+            { id: 'dock2', type: 'app', label: '长期记忆', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M10 16 A 4 4 0 1 1 16 10 C 22 16, 22 22, 16 22 M16 22 A 4 4 0 1 1 10 16 C 10 16, 16 10, 22 10" class="s-line"/></svg>' },
+            { id: 'dock3', type: 'app', label: '圈圈', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" class="s-line"/><circle cx="16" cy="16" r="4" class="s-line"/></svg>' },
+            { id: 'dock4', type: 'app', label: '番茄钟', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="18" r="10" class="s-line"/><path d="M16 8 C16 4, 12 6, 12 6 M16 8 C16 4, 20 6, 20 6" class="s-line"/></svg>' }
         ]
 
         document.addEventListener('alpine:init', () => {
@@ -200,16 +213,21 @@ const html = `<!DOCTYPE html>
                 widgetModalOpen: false,
                 widgetTab: '2x2',
                 
-                pages: [JSON.parse(JSON.stringify(initData))], // 二维数组
+                pages: [JSON.parse(JSON.stringify(initData.slice(0, 9))), JSON.parse(JSON.stringify(initData.slice(9, 18)))], // 二维数组
                 dock: JSON.parse(JSON.stringify(initDock)),
                 deletedItems: [],
                 
                 availableWidgets: [
-                    { type: 'widget', size: '2x2', label: '纪念日', desc: '倒数纪念日与重要事件' },
-                    { type: 'widget', size: '2x2', label: '电池状态', desc: '显示双方手机电量' },
-                    { type: 'widget', size: '4x2', label: '一起看', desc: '当前进度与封面' },
-                    { type: 'widget', size: '4x2', label: '音乐播放器', desc: '一起听正在播放' },
-                    { type: 'widget', size: '4x4', label: '便签卡片', desc: '大尺寸图文手帐' }
+                    { type: 'widget', size: '2x2', label: '天气', desc: '实时天气与预报' },
+                    { type: 'widget', size: '2x2', label: '番茄钟', desc: '专属专注力管家' },
+                    { type: 'widget', size: '2x2', label: '经期追踪', desc: '安全期与小贴士' },
+                    { type: 'widget', size: '2x2', label: '恋爱天数', desc: '相恋时光与纪念日' },
+                    { type: 'widget', size: '4x2', label: '奶油猫猫', desc: '治愈系桌面电子宠' },
+                    { type: 'widget', size: '4x2', label: '精致手帐', desc: '今日随笔与待办' },
+                    { type: 'widget', size: '4x2', label: '角色语录', desc: '每日寄语与碎碎念' },
+                    { type: 'widget', size: '4x2', label: '猫爪相册', desc: '随机展示收藏照片' },
+                    { type: 'widget', size: '4x4', label: '音乐共享播放器', desc: 'Ta正在听的旋律' },
+                    { type: 'widget', size: '4x4', label: 'ID CARD角色心情卡片', desc: '实时心情状态感知' }
                 ],
                 
                 longPressTimer: null,
