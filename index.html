@@ -2540,7 +2540,7 @@
               <div class="icon-box squircle" 
                    :class="(item.customIconUrl || dressUp.icon.imgUrl || dressUp.icon.color) ? '' : item.color" 
                    :style="(item.customIconUrl || dressUp.icon.imgUrl) ? `background-image: url(${$store.imageStore.get(item.customIconUrl || dressUp.icon.imgUrl)}), linear-gradient(145deg, #FFF0F3, #FFE4E8); background-color: transparent;` : (dressUp.icon.color ? `background: ${dressUp.icon.color};` : '')"
-                   x-html="(item.customIconUrl || dressUp.icon.imgUrl) ? '' : SVGS[item.icon]">
+                   x-html="(item.customIconUrl || dressUp.icon.imgUrl) ? '' : svgs[item.icon]">
               </div>
               <div class="icon-title" x-show="!dressUp.icon.hideName" x-text="item.title"></div>
             </div>
@@ -2964,7 +2964,7 @@
             </div>
           </template>
           
-          <div class="delete-btn" x-show="item.type === 'widget'" @click.stop.prevent="deleteItem(item.id)" x-html="SVGS.Minus"></div>
+          <div class="delete-btn" x-show="item.type === 'widget'" @click.stop.prevent="deleteItem(item.id)" x-html="svgs.Minus"></div>
         </div>
       </template>
     </div>
@@ -2979,12 +2979,12 @@
             :style="`order: ${index}`"
             @click="if(isJiggling && item.type === 'app') openAppEdit(item, $event); else if(item.type === 'app' && !isJiggling) openApp(item); else if(item.type === 'widget' && !isJiggling) openWidgetSettings(item)"
           >
-            <div class="delete-btn" x-show="item.type === 'widget'" @click.stop.prevent="deleteItem(item.id)" x-html="SVGS.Minus"></div>
+            <div class="delete-btn" x-show="item.type === 'widget'" @click.stop.prevent="deleteItem(item.id)" x-html="svgs.Minus"></div>
             <div class="app-icon">
               <div class="dock-icon squircle" 
                    :class="(item.customIconUrl || dressUp.icon.imgUrl || dressUp.icon.color) ? '' : item.color" 
                    :style="(item.customIconUrl || dressUp.icon.imgUrl) ? `background-image: url(${$store.imageStore.get(item.customIconUrl || dressUp.icon.imgUrl)}), linear-gradient(145deg, #FFF0F3, #FFE4E8); background-color: transparent;` : (dressUp.icon.color ? `background: ${dressUp.icon.color};` : '')"
-                   x-html="(item.customIconUrl || dressUp.icon.imgUrl) ? '' : SVGS[item.icon]">
+                   x-html="(item.customIconUrl || dressUp.icon.imgUrl) ? '' : svgs[item.icon]">
               </div>
               <div class="icon-title" style="color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5);" x-show="!dressUp.icon.hideName" x-text="item.title"></div>
             </div>
@@ -3052,7 +3052,7 @@
                             <div class="transition-all duration-300 shadow-sm flex items-center justify-center text-white" 
                                  :class="(item.customIconUrl || dressUp.icon.imgUrl || dressUp.icon.color) ? '' : item.color"
                                  :style="`width: ${getIconSize()}; height: ${getIconSize()}; border-radius: ${dressUp.icon.radius}px; overflow: hidden; ${(item.customIconUrl || dressUp.icon.imgUrl) ? 'background-image: url(' + $store.imageStore.get(item.customIconUrl || dressUp.icon.imgUrl) + '); background-size: cover; background-color: transparent;' : (dressUp.icon.color ? 'background: ' + dressUp.icon.color + ';' : '')}`">
-                                 <div x-show="!(item.customIconUrl || dressUp.icon.imgUrl)" x-html="SVGS[item.icon]" style="width: 60%; height: 60%;"></div>
+                                 <div x-show="!(item.customIconUrl || dressUp.icon.imgUrl)" x-html="svgs[item.icon]" style="width: 60%; height: 60%;"></div>
                             </div>
                             <span x-show="!dressUp.icon.hideName" class="text-[9px] text-gray-500 max-w-[50px] truncate" x-text="item.title"></span>
                         </div>
@@ -5016,7 +5016,7 @@
     <div class="app-context-menu" x-show="editingApp" x-cloak x-transition.opacity :style="`top: ${eaPosition.top}; left: ${eaPosition.left};`">
       <div class="acm-header">
         <div class="app-icon" style="transform: scale(0.8); transform-origin: left center; margin-right: 10px;">
-          <div class="icon-box squircle" :class="(eaIconUrl || dressUp.icon.imgUrl || dressUp.icon.color) ? '' : editingApp?.color" x-html="(eaIconUrl || dressUp.icon.imgUrl) ? '' : (editingApp ? SVGS[editingApp.icon] : '')" :style="(eaIconUrl || dressUp.icon.imgUrl) ? `background-image: url(${$store.imageStore.get(eaIconUrl || dressUp.icon.imgUrl)}), linear-gradient(145deg, #FFF0F3, #FFE4E8); background-color: transparent;` : (dressUp.icon.color ? `background: ${dressUp.icon.color};` : '')"></div>
+          <div class="icon-box squircle" :class="(eaIconUrl || dressUp.icon.imgUrl || dressUp.icon.color) ? '' : editingApp?.color" x-html="(eaIconUrl || dressUp.icon.imgUrl) ? '' : (editingApp ? svgs[editingApp.icon] : '')" :style="(eaIconUrl || dressUp.icon.imgUrl) ? `background-image: url(${$store.imageStore.get(eaIconUrl || dressUp.icon.imgUrl)}), linear-gradient(145deg, #FFF0F3, #FFE4E8); background-color: transparent;` : (dressUp.icon.color ? `background: ${dressUp.icon.color};` : '')"></div>
         </div>
         <div style="flex: 1;">
           <input type="text" class="acm-input" x-model="eaTitle" placeholder="App 名称">

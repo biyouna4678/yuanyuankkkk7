@@ -1,0 +1,347 @@
+const fs = require('fs');
+const html = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>星织 Sophia - 视觉原型 V2</title>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        :root { --primary-pink: #FF91B9; --stroke-color: #5C5454; --icon-bg: #FFFFFF; --ear-pink: #FFD1DC; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, sans-serif; background: linear-gradient(160deg, #FDF2F7 0%, #FFDDE1 100%); overflow: hidden; }
+        
+        .status-bar { height: 44px; padding: 0 22px; display: flex; justify-content: space-between; align-items: flex-end; color: var(--stroke-color); font-size: 14px; font-weight: 900; }
+        .status-right { display: flex; align-items: center; gap: 8px; padding-bottom: 4px; }
+        
+        .pages-container { width: 100vw; height: calc(100vh - 160px); display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-behavior: smooth; }
+        .pages-container::-webkit-scrollbar { display: none; }
+        
+        .page { flex-shrink: 0; width: 100vw; height: 100%; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: min-content; gap: 20px 15px; padding: 20px; box-sizing: border-box; scroll-snap-align: start; align-content: start; }
+        
+        .app-item { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+        .app-item.shake { animation: shake 0.3s infinite alternate; }
+        .app-item.shake:nth-child(even) { animation-direction: alternate-reverse; }
+        
+        .app-box { width: 60px; height: 60px; border-radius: 22px; background: var(--icon-bg); display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); border: 1.2px solid rgba(255,145,185,0.08); position: relative; }
+        
+        .app-label { font-size: 11px; color: var(--stroke-color); font-weight: 600; text-align: center; width: 68px; }
+        
+        .indicator-wrapper { position: fixed; bottom: 115px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; pointer-events: none; z-index: 10; }
+        .dot { width: 6px; height: 6px; border-radius: 3px; background: var(--stroke-color); opacity: 0.2; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .dot.active { width: 16px; opacity: 0.6; background: var(--primary-pink); }
+        
+        .dock-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(255,255,255,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 32px; display: flex; justify-content: space-around; align-items: center; z-index: 5; padding: 0 10px; box-sizing: border-box; }
+        .dock-container .app-item { margin: 0; }
+        .dock-container .app-label { display: none; }
+        
+        svg { display: block; overflow: visible; }
+        .s-line { fill: none; stroke: var(--stroke-color); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        .s-fill { fill: var(--stroke-color); }
+        
+        /* 编辑模式 */
+        @keyframes shake { 0% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
+        .delete-btn { position: absolute; top: -5px; left: -5px; width: 22px; height: 22px; background: rgba(200,200,200,0.8); backdrop-filter: blur(10px); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 16px; font-weight: bold; cursor: pointer; z-index: 10; font-family: ui-sans-serif, system-ui, -apple-system; }
+        .sortable-ghost { opacity: 0.4; }
+        
+        /* 编辑菜单 */
+        .edit-header { position: fixed; top: 0; left: 0; right: 0; padding: 50px 20px 10px; display: flex; justify-content: space-between; z-index: 20; background: linear-gradient(to bottom, rgba(253,242,247,0.9), transparent); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .edit-header.show { opacity: 1; pointer-events: auto; }
+        .edit-btn { background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; color: var(--primary-pink); }
+        .edit-menu { position: absolute; top: 100px; left: 20px; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border-radius: 16px; padding: 10px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 30; }
+        .edit-menu-item { padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--stroke-color); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .edit-menu-item:last-child { border-bottom: none; }
+        
+        /* 弹窗 */
+        .widget-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .widget-modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .widget-modal { position: absolute; bottom: 0; left: 0; right: 0; height: 75vh; background: #FDF2F7; border-radius: 30px 30px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
+        .widget-modal-overlay.show .widget-modal { transform: translateY(0); }
+        .modal-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: var(--stroke-color); font-size: 18px; }
+        .close-btn { width: 30px; height: 30px; background: rgba(0,0,0,0.05); border-radius: 15px; display: flex; justify-content: center; align-items: center; font-family: ui-sans-serif, system-ui, -apple-system; font-size: 16px;}
+        .modal-tabs { display: flex; padding: 0 20px 10px; gap: 15px; }
+        .modal-tab { font-weight: 600; font-size: 14px; color: #999; padding-bottom: 6px; }
+        .modal-tab.active { color: var(--stroke-color); border-bottom: 3px solid var(--primary-pink); }
+        .modal-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+        
+        /* 小组件和网格配置 */
+        .widget-preview-card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; text-align: center; }
+        .w-2x2 { grid-column: span 2; grid-row: span 2; height: auto; align-items: stretch;}
+        .w-4x2 { grid-column: span 4; grid-row: span 2; height: auto; align-items: stretch;}
+        .w-4x4 { grid-column: span 4; grid-row: span 4; height: auto; align-items: stretch;}
+        .w-2x2 .widget-card-actual, .w-4x2 .widget-card-actual, .w-4x4 .widget-card-actual { min-height: 100%; aspect-ratio: unset;}
+        .w-2x2 .widget-card-actual { aspect-ratio: 1; }
+        .w-4x2 .widget-card-actual { aspect-ratio: 2/1 auto; height: 140px; }
+        .w-4x4 .widget-card-actual { aspect-ratio: 1/1 auto; height: 300px; }
+        
+        .widget-card-actual { background: white; width: 100%; height: 100%; border-radius: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.04); padding: 15px; box-sizing: border-box; }
+        .widget-title { font-weight: 700; color: var(--stroke-color); }
+        .widget-desc { font-size: 12px; color: #999; }
+    </style>
+</head>
+<body x-data="desktopApp()" @click="handleBgClick" x-init="init()" @contextmenu.prevent="() => {}">
+    <div class="status-bar">
+        <div>18:32</div>
+        <div class="status-right">
+            <svg width="22" height="12" viewBox="0 0 22 12"><rect x="1" y="8" width="3.2" height="4" rx="1.2" class="s-fill"/><rect x="6" y="6" width="3.2" height="6" rx="1.2" class="s-fill"/><rect x="11" y="4" width="3.2" height="8" rx="1.2" class="s-fill"/><rect x="16" y="2" width="3.2" height="10" rx="1.2" class="s-fill" opacity="0.2"/></svg>
+            <svg width="18" height="14" viewBox="0 0 18 14"><circle cx="9" cy="12" r="1.8" class="s-fill"/><path d="M5 8 Q9 4 13 8" class="s-line" stroke-width="2.2"/><path d="M2 5 Q9 -1 16 5" class="s-line" stroke-width="2.2"/></svg>
+            <svg width="22" height="12" viewBox="0 0 22 12"><rect x="1" y="1.5" width="16" height="9" rx="3" class="s-line" stroke-width="1.8"/><rect x="4" y="4" width="7" height="4" rx="1" class="s-fill"/><path d="M19.5 4.5 V7.5" class="s-line" stroke-width="2"/></svg>
+        </div>
+    </div>
+
+    <!-- 编辑头 -->
+    <div class="edit-header" :class="editMode ? 'show' : ''">
+        <div style="position: relative;">
+            <button class="edit-btn" @click.stop="menuOpen = !menuOpen">+ 添加</button>
+            <div class="edit-menu" x-show="menuOpen" x-transition x-cloak @click.stop>
+                <div class="edit-menu-item" @click="openWidgetModal()">📦 添加小组件</div>
+                <div class="edit-menu-item">🎨 自定义图标</div>
+                <div class="edit-menu-item">🖼️ 主屏幕壁纸</div>
+            </div>
+        </div>
+        <button class="edit-btn" @click="exitEditMode()">完成</button>
+    </div>
+
+    <!-- Page Container -->
+    <div class="pages-container" @scroll="activePage = Math.round($el.scrollLeft / window.innerWidth)">
+        <template x-for="(page, pIndex) in pages" :key="pIndex">
+            <div class="page" :id="'page-' + pIndex" @touchstart="startLongPress" @touchend="clearLongPress" @touchmove="clearLongPress" @mousedown="startLongPress" @mouseup="clearLongPress" @mousemove="clearLongPress">
+                <template x-for="item in page" :key="item.id">
+                    <div class="app-item" :class="(editMode ? 'shake ' : '') + (item.type === 'widget' ? 'w-'+item.size : '')" :data-id="item.id">
+                        <div class="delete-btn" x-show="editMode" @click.stop="deleteItem(pIndex, item.id)">✕</div>
+                        
+                        <template x-if="item.type === 'app'">
+                            <div class="app-box" x-html="item.svg"></div>
+                        </template>
+                        <template x-if="item.type === 'app'">
+                            <div class="app-label" x-text="item.label"></div>
+                        </template>
+
+                        <template x-if="item.type === 'widget'">
+                            <div class="widget-card-actual">
+                                <div class="widget-title" x-text="item.label"></div>
+                                <div class="widget-desc" x-text="item.size === '2x2' ? '小组件' : (item.size === '4x2' ? '中组件' : '大组件')"></div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+
+    <!-- 指示器 -->
+    <div class="indicator-wrapper">
+        <template x-for="(page, idx) in pages" :key="idx">
+            <div class="dot" :class="activePage === idx ? 'active' : ''"></div>
+        </template>
+    </div>
+
+    <!-- Dock -->
+    <div class="dock-container" id="dock-container">
+        <template x-for="item in dock" :key="item.id">
+            <div class="app-item" :class="editMode ? 'shake' : ''" :data-id="item.id">
+                <div class="delete-btn" x-show="editMode" @click.stop="deleteDockItem(item.id)">✕</div>
+                <div class="app-box" x-html="item.svg"></div>
+            </div>
+        </template>
+    </div>
+
+    <!-- 小组件弹窗 -->
+    <div class="widget-modal-overlay" :class="widgetModalOpen ? 'show' : ''" @click="widgetModalOpen = false">
+        <div class="widget-modal" @click.stop>
+            <div class="modal-header">
+                <div>添加小组件</div>
+                <div class="close-btn" @click="widgetModalOpen = false">✕</div>
+            </div>
+            <div class="modal-tabs">
+                <div class="modal-tab" :class="widgetTab === '2x2' ? 'active' : ''" @click="widgetTab = '2x2'">小 2×2</div>
+                <div class="modal-tab" :class="widgetTab === '4x2' ? 'active' : ''" @click="widgetTab = '4x2'">中 4×2</div>
+                <div class="modal-tab" :class="widgetTab === '4x4' ? 'active' : ''" @click="widgetTab = '4x4'">大 4×4</div>
+            </div>
+            <div class="modal-content">
+                <template x-for="widget in availableWidgets.filter(w => w.size === widgetTab)" :key="widget.id">
+                    <div class="widget-preview-card" @click="addWidget(widget)">
+                        <div class="widget-title" x-text="widget.label"></div>
+                        <div class="widget-desc" x-text="widget.desc"></div>
+                        <div class="edit-btn" style="margin-top: 10px;">添加组件</div>
+                    </div>
+                </template>
+                <div x-show="widgetTab === '4x4'" style="text-align: center; color: #999; margin-top: 20px; font-size: 14px;">
+                    + CSS 自定义上传
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initData = [
+            { id: 'app1', type: 'app', label: '轻盈计划', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M10 24 Q16 22 24 8 Q18 8 10 16 Z" class="s-line"/><path d="M11 23 L14 20 M17 17 L20 14" class="s-line" stroke-width="2.2"/></svg>' },
+            { id: 'app2', type: 'app', label: '查手机', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect x="9" y="4" width="14" height="24" rx="3.5" class="s-line" /><line x1="13" y1="24" x2="19" y2="24" class="s-line" stroke-width="2" opacity="0.4" /><circle cx="16" cy="6.5" r="0.8" class="s-fill" /></svg>' },
+            { id: 'app3', type: 'app', label: '情侣空间', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M11 8 C6 4, 1 9, 11 19 C21 9, 16 4, 11 8" class="s-line" stroke-width="3.2"/><path d="M22 15 C19 12, 16 16, 22 22 C28 16, 25 12, 22 15" class="s-line" stroke-width="2.5"/></svg>' },
+            { id: 'app4', type: 'app', label: '经期记录', svg: '<svg width="36" height="36" viewBox="0 0 36 36"><g class="s-fill"><circle cx="18" cy="10" r="5.5"/><circle cx="18" cy="26" r="5.5"/><circle cx="10" cy="18" r="5.5"/><circle cx="26" cy="18" r="5.5"/><circle cx="12.3" cy="12.3" r="5.5"/><circle cx="23.7" cy="23.7" r="5.5"/><circle cx="12.3" cy="23.7" r="5.5"/><circle cx="23.7" cy="12.3" r="5.5"/></g><g fill="white"><circle cx="18" cy="13" r="3.5"/><circle cx="18" cy="23" r="3.5"/><circle cx="13" cy="18" r="3.5"/><circle cx="23" cy="18" r="3.5"/><circle cx="14.5" cy="14.5" r="3.5"/><circle cx="21.5" cy="21.5" r="3.5"/><circle cx="14.5" cy="21.5" r="3.5"/><circle cx="21.5" cy="14.5" r="3.5"/></g><circle cx="18" cy="18" r="3.5" class="s-fill"/></svg>' },
+            { id: 'app5', type: 'app', label: '心动OOTD', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M7 6 Q7 4 9 4 H23 Q25 4 25 6 V26 Q25 28 23 28 H9 Q7 28 7 26 Z" class="s-line" /><line x1="16" y1="4" x2="16" y2="28" class="s-line" stroke-width="1.5" /><circle cx="13.5" cy="16" r="1" class="s-fill" /><circle cx="18.5" cy="16" r="1" class="s-fill" /></svg>' },
+            { id: 'app6', type: 'app', label: '解梦', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M22 20 A8 8 0 1 1 12 10 A6 6 0 0 0 22 20" class="s-line"/><path d="M22 6 L22.5 6 M26 10 L26.5 10" class="s-line" stroke-width="4"/></svg>' },
+            { id: 'app7', type: 'app', label: '塔罗牌', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 6 L19 13 H26 L21 18 L23 26 L16 21 L9 26 L11 18 L6 13 H13 Z" class="s-line"/></svg>' },
+            { id: 'app8', type: 'app', label: '世界书', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M9 5 H23 C24 5 25 6 25 7 V23 C25 24 24 25 23 25 H9 C8 25 7 24 7 23 V7 C7 6 8 5 9 5 Z" class="s-line" /><path d="M7 23 C7 25 8 27 10 27 H25 V25" class="s-line" /><path d="M25 25 C23 25 22 24 22 23" class="s-line" /><path d="M11 5 V16 L14 13 L17 16 V5" class="s-line" stroke-width="2.5" /></svg>' }
+        ];
+
+        const initDock = [
+            { id: 'dock1', type: 'app', label: '设置', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 12 A4 4 0 1 1 16 20 A4 4 0 1 1 16 12" class="s-line" /><path d="M14.5 4.5 L17.5 4.5 L18 7 Q19 7.5 20 8 L22.5 7 L24.5 9 L23 11.5 Q23.5 12.5 24 13.5 L27 14 L27 17 L24 17.5 Q23.5 18.5 23 19.5 L24.5 22 L22.5 24 L20 23 Q19 23.5 18 24 L17.5 27 L14.5 27 L14 24 Q13 23.5 12 23 L9.5 24 L7.5 22 L9 19.5 Q8.5 18.5 8 17.5 L5 17 L5 14 L8 13.5 Q8.5 12.5 9 11.5 L7.5 9 L9.5 7 L12 8 Q13 7.5 14 7 Z" class="s-line" stroke-width="2.5" /></svg>' },
+            { id: 'dock2', type: 'app', label: '论坛', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M6 12 H18 V20 H10 L6 24 Z" class="s-line"/><path d="M22 10 V16 H26 L30 20 V10 H22" class="s-line" stroke-width="2.2"/></svg>' },
+            { id: 'dock3', type: 'app', label: '信件', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect x="5" y="8" width="22" height="16" rx="2" class="s-line" fill="white" /><path d="M5 8 L16 16 L27 8" class="s-line" /></svg>' },
+            { id: 'dock4', type: 'app', label: '商城', svg: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M8 12 L6 26 H26 L24 12 Z" class="s-line" fill="white" /><path d="M11 12 Q11 6, 16 6 Q21 6, 21 12" class="s-line" /><line x1="7" y1="18" x2="25" y2="18" class="s-line" stroke-width="1.5" opacity="0.4" /></svg>' }
+        ]
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('desktopApp', () => ({
+                activePage: 0,
+                editMode: false,
+                menuOpen: false,
+                widgetModalOpen: false,
+                widgetTab: '2x2',
+                
+                pages: [JSON.parse(JSON.stringify(initData))], // 二维数组
+                dock: JSON.parse(JSON.stringify(initDock)),
+                deletedItems: [],
+                
+                availableWidgets: [
+                    { type: 'widget', size: '2x2', label: '纪念日', desc: '倒数纪念日与重要事件' },
+                    { type: 'widget', size: '2x2', label: '电池状态', desc: '显示双方手机电量' },
+                    { type: 'widget', size: '4x2', label: '一起看', desc: '当前进度与封面' },
+                    { type: 'widget', size: '4x2', label: '音乐播放器', desc: '一起听正在播放' },
+                    { type: 'widget', size: '4x4', label: '便签卡片', desc: '大尺寸图文手帐' }
+                ],
+                
+                longPressTimer: null,
+                sortables: [],
+
+                init() {
+                    this.$nextTick(() => { this.initDragAndDrop(); });
+                    this.$watch('editMode', val => {
+                        this.sortables.forEach(s => s.option("disabled", !val));
+                    });
+                },
+
+                startLongPress(e) {
+                    if (this.editMode || e.target.closest('.delete-btn')) return;
+                    this.longPressTimer = setTimeout(() => {
+                        this.editMode = true;
+                        if (navigator.vibrate) navigator.vibrate(50);
+                    }, 500);
+                },
+
+                clearLongPress() {
+                    if (this.longPressTimer) {
+                        clearTimeout(this.longPressTimer);
+                        this.longPressTimer = null;
+                    }
+                },
+
+                exitEditMode() {
+                    this.editMode = false;
+                    this.menuOpen = false;
+                    this.syncDataFromDOM();
+                },
+
+                handleBgClick(e) {
+                    if (this.editMode && !e.target.closest('.app-item') && !e.target.closest('.edit-header') && !e.target.closest('.delete-btn')) {
+                        this.exitEditMode();
+                    }
+                    if (this.menuOpen) this.menuOpen = false;
+                },
+
+                openWidgetModal() {
+                    this.menuOpen = false;
+                    this.widgetModalOpen = true;
+                },
+
+                addWidget(widget) {
+                    const newWidget = { ...widget, id: 'w_' + Date.now() };
+                    // 确保有足够的页面
+                    if (this.pages.length === 0) this.pages.push([]);
+                    this.pages[this.activePage].push(newWidget);
+                    this.widgetModalOpen = false;
+                    
+                    this.$nextTick(() => { this.initDragAndDrop(); });
+                },
+
+                deleteItem(pageIndex, itemId) {
+                    const idx = this.pages[pageIndex].findIndex(i => i.id === itemId);
+                    if (idx > -1) {
+                        const item = this.pages[pageIndex].splice(idx, 1)[0];
+                        this.deletedItems.push(item);
+                        this.$nextTick(() => { this.initDragAndDrop(); });
+                    }
+                },
+
+                deleteDockItem(itemId) {
+                    const idx = this.dock.findIndex(i => i.id === itemId);
+                    if (idx > -1) {
+                        const item = this.dock.splice(idx, 1)[0];
+                        this.deletedItems.push(item);
+                        this.$nextTick(() => { this.initDragAndDrop(); });
+                    }
+                },
+
+                initDragAndDrop() {
+                    this.sortables.forEach(s => s.destroy());
+                    this.sortables = [];
+
+                    const pageEls = document.querySelectorAll('.page');
+                    pageEls.forEach((el, index) => {
+                        const s = new Sortable(el, {
+                            group: 'desktop',
+                            animation: 250,
+                            disabled: !this.editMode, // 只有开启编辑模式才能拖拽，或者由长按开启
+                            ghostClass: 'sortable-ghost',
+                            onEnd: () => { this.syncDataFromDOM(); }
+                        });
+                        this.sortables.push(s);
+                    });
+
+                    const dockEl = document.getElementById('dock-container');
+                    if (dockEl) {
+                        const sDock = new Sortable(dockEl, {
+                            group: { name: 'desktop', put: (to, from, dragEl) => !dragEl.classList.contains('w-2x2') && !dragEl.classList.contains('w-4x2') && !dragEl.classList.contains('w-4x4') }, // Dock不能放小组件
+                            animation: 250,
+                            disabled: !this.editMode,
+                            ghostClass: 'sortable-ghost',
+                            onEnd: () => { this.syncDataFromDOM(); }
+                        });
+                        this.sortables.push(sDock);
+                    }
+                },
+
+                syncDataFromDOM() {
+                    const allItems = {};
+                    this.pages.forEach(p => p.forEach(i => allItems[i.id] = i));
+                    this.dock.forEach(i => allItems[i.id] = i);
+
+                    const newPages = [];
+                    document.querySelectorAll('.page').forEach(pageEl => {
+                        const pageItems = [];
+                        pageEl.querySelectorAll('.app-item').forEach(itemEl => {
+                            const id = itemEl.getAttribute('data-id');
+                            if (allItems[id]) pageItems.push(allItems[id]);
+                        });
+                        newPages.push(pageItems);
+                    });
+
+                    const newDock = [];
+                    document.querySelectorAll('#dock-container .app-item').forEach(itemEl => {
+                        const id = itemEl.getAttribute('data-id');
+                        if (allItems[id]) newDock.push(allItems[id]);
+                    });
+
+                    this.pages = newPages;
+                    this.dock = newDock;
+                    
+                    // 等待Alpine重新渲染以防状态丢失导致拖拽卡顿
+                    this.$nextTick(() => { this.initDragAndDrop(); });
+                }
+            }));
+        });
+    </script>
+</body>
+</html>`;
+fs.writeFileSync('v2_desktop_prototype.html', html);
